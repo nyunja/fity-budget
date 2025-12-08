@@ -3,11 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Wallet } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import StatCard from './components/StatCard';
-import MoneyFlowChart from './components/MoneyFlowChart';
-import BudgetChart from './components/BudgetChart';
-import TransactionList from './components/TransactionList';
-import SavingGoals from './components/SavingGoals';
+import Dashboard from './components/dashboard/Dashboard';
 import Login from './components/Login';
 import Register from './components/Register';
 import Onboarding from './components/Onboarding';
@@ -35,19 +31,9 @@ const AppContent: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  // Fetch Dashboard Data
+  // Fetch data for insights generation (Header component)
   const { data: dashboardData } = useAPI<{ stats: StatMetric[] }>(
     () => analyticsAPI.getDashboard(),
-    { auto: isAuthenticated }
-  );
-
-  const { data: moneyFlowData } = useAPI<{ flow: MoneyFlowData[] }>(
-    () => analyticsAPI.getMoneyFlow(),
-    { auto: isAuthenticated }
-  );
-
-  const { data: budgetSummary } = useAPI<{ categories: BudgetCategory[] }>(
-    () => budgetsAPI.getSummary(),
     { auto: isAuthenticated }
   );
 
@@ -61,18 +47,7 @@ const AppContent: React.FC = () => {
     { auto: isAuthenticated }
   );
 
-  // Derived State
-  // Create default stats if backend returns empty data
-  const defaultStats: StatMetric[] = [
-    { label: 'Total balance', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
-    { label: 'Income', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
-    { label: 'Expense', value: 0, trend: 0, trendDirection: 'down', prefix: '$' },
-    { label: 'Total savings', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
-  ];
-
-  const stats = dashboardData?.stats && dashboardData.stats.length > 0 ? dashboardData.stats : defaultStats;
-  const moneyFlow = moneyFlowData?.flow || [];
-  const budget = budgetSummary?.categories || [];
+  const stats = dashboardData?.stats || [];
   const transactions = recentTransactions?.transactions || [];
   const goals = goalsData?.goals || [];
 
@@ -218,34 +193,7 @@ const AppContent: React.FC = () => {
 
           {/* Dashboard View */}
           {view === 'dashboard' && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
-                  <StatCard key={index} {...stat} />
-                ))}
-              </div>
-
-              {/* Main Charts Row */}
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div className="xl:col-span-2 h-[400px]">
-                  <MoneyFlowChart data={moneyFlow} />
-                </div>
-                <div className="xl:col-span-1 h-[400px]">
-                  <BudgetChart data={budget} />
-                </div>
-              </div>
-
-              {/* Bottom Row */}
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div className="xl:col-span-2">
-                  <TransactionList data={transactions.slice(0, 5)} />
-                </div>
-                <div className="xl:col-span-1">
-                  <SavingGoals data={goals.slice(0, 4)} />
-                </div>
-              </div>
-            </div>
+            <Dashboard />
           )}
 
           {/* Transactions View */}
