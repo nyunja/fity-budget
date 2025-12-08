@@ -62,9 +62,17 @@ const AppContent: React.FC = () => {
   );
 
   // Derived State
-  const stats = dashboardData?.stats || STATS;
-  const moneyFlow = moneyFlowData?.flow || MONEY_FLOW_DATA;
-  const budget = budgetSummary?.categories || BUDGET_DATA;
+  // Create default stats if backend returns empty data
+  const defaultStats: StatMetric[] = [
+    { label: 'Total balance', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
+    { label: 'Income', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
+    { label: 'Expense', value: 0, trend: 0, trendDirection: 'down', prefix: '$' },
+    { label: 'Total savings', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
+  ];
+
+  const stats = dashboardData?.stats && dashboardData.stats.length > 0 ? dashboardData.stats : defaultStats;
+  const moneyFlow = moneyFlowData?.flow || [];
+  const budget = budgetSummary?.categories || [];
   const transactions = recentTransactions?.transactions || [];
   const goals = goalsData?.goals || [];
 
