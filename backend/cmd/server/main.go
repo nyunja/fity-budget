@@ -8,8 +8,10 @@ import (
 	"github.com/nyunja/fity-budget-backend/internal/api/handlers"
 	"github.com/nyunja/fity-budget-backend/internal/api/routes"
 	"github.com/nyunja/fity-budget-backend/internal/config"
+	"github.com/nyunja/fity-budget-backend/internal/models"
 	"github.com/nyunja/fity-budget-backend/internal/repository"
 	"github.com/nyunja/fity-budget-backend/internal/services"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -21,6 +23,14 @@ func main() {
 	db, err := config.ConnectDB(cfg)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
+	}
+
+	// Run auto-migrations on startup
+	log.Println("Running database migrations...")
+	if err := runMigrations(db); err != nil {
+		log.Printf("Warning: Migration failed: %v", err)
+	} else {
+		log.Println("✓ Database migrations completed successfully")
 	}
 
 	// Initialize repositories
@@ -84,4 +94,21 @@ func main() {
 	if err := router.Run(addr); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
+}
+
+// runMigrations runs database migrations on startup
+func runMigrations(db *gorm.DB) error {
+	log.Println("Enabling UUID extension...")
+	if err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"").Error; err != nil {
+		log.Printf("Warning: Could not create uuid-ossp extension: %v", err)
+	}
+
+	log.Println("Running auto-migrations for all models...")
+	return db.AutoMigrate(
+		&models.User{},
+		&models.Wallet{},
+		&models.Transaction{},
+		&models.SavingGoal{},
+		&models.Budget{},
+	)
 }
