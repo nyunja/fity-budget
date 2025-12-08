@@ -15,6 +15,7 @@ import (
 	"github.com/nyunja/fity-budget-backend/internal/models"
 	"github.com/nyunja/fity-budget-backend/internal/repository"
 	"github.com/nyunja/fity-budget-backend/internal/services"
+	"github.com/nyunja/fity-budget-backend/internal/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -112,7 +113,7 @@ func setup() {
 	goalService := services.NewGoalService(goalRepo)
 	budgetService := services.NewBudgetService(budgetRepo, transactionRepo)
 	walletService := services.NewWalletService(walletRepo)
-	analyticsService := services.NewAnalyticsService(transactionRepo, goalRepo, budgetRepo, walletRepo)
+	analyticsService := services.NewAnalyticsService(transactionRepo, walletRepo, budgetRepo, goalRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
@@ -214,20 +215,10 @@ func createTestWallet(t *testing.T, userID uuid.UUID, name string, balance float
 	return wallet
 }
 
-// generateTestToken generates a JWT token for testing
+// generateTestToken generates a JWT token for testing using the actual JWT library
 func generateTestToken(userID uuid.UUID, email, secret string, expiry time.Duration) (string, error) {
-	// Use the same JWT generation logic as the main app
-	// This is a simplified version - in production, import from utils
-	claims := map[string]interface{}{
-		"user_id": userID,
-		"email":   email,
-		"exp":     time.Now().Add(expiry).Unix(),
-		"iat":     time.Now().Unix(),
-	}
-
-	// For testing purposes, we'll use a simple token
-	// In a real scenario, you'd use the actual JWT library
-	return fmt.Sprintf("test-token-%s", userID.String()), nil
+	// Use the actual JWT generation from utils package
+	return utils.GenerateJWT(userID, email, secret, expiry)
 }
 
 func getEnv(key, defaultValue string) string {

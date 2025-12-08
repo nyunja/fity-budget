@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/nyunja/fity-budget-backend/internal/models"
 )
@@ -28,7 +27,6 @@ func TestBudgetIntegration_CreateBudget(t *testing.T) {
 			requestBody: map[string]interface{}{
 				"category":        "Food & Groceries",
 				"limit":           15000.00,
-				"period":          "monthly",
 				"alert_threshold": 80,
 				"color":           "#4F46E5",
 			},
@@ -56,7 +54,7 @@ func TestBudgetIntegration_CreateBudget(t *testing.T) {
 			requestBody: map[string]interface{}{
 				"category": "Transport",
 				"limit":    5000.00,
-				"period":   "monthly",
+				"color":    "#3B82F6",
 			},
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -65,8 +63,7 @@ func TestBudgetIntegration_CreateBudget(t *testing.T) {
 					UserID:      user.ID,
 					Category:    "Transport",
 					LimitAmount: 5000.00,
-					Period:      "monthly",
-					StartDate:   time.Now(),
+					Color:       "#3B82F6",
 				}
 				testDB.Create(existingBudget)
 
@@ -81,7 +78,7 @@ func TestBudgetIntegration_CreateBudget(t *testing.T) {
 			requestBody: map[string]interface{}{
 				"category": "Entertainment",
 				"limit":    -1000.00,
-				"period":   "monthly",
+				"color":    "#8B5CF6",
 			},
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -124,25 +121,19 @@ func TestBudgetIntegration_ListBudgets(t *testing.T) {
 			UserID:      user.ID,
 			Category:    "Food",
 			LimitAmount: 15000.00,
-			SpentAmount: 8000.00,
-			Period:      "monthly",
-			StartDate:   time.Now(),
+			Color:       "#10B981",
 		},
 		{
 			UserID:      user.ID,
 			Category:    "Transport",
 			LimitAmount: 5000.00,
-			SpentAmount: 2000.00,
-			Period:      "monthly",
-			StartDate:   time.Now(),
+			Color:       "#3B82F6",
 		},
 		{
 			UserID:      user.ID,
 			Category:    "Entertainment",
 			LimitAmount: 3000.00,
-			SpentAmount: 1500.00,
-			Period:      "monthly",
-			StartDate:   time.Now(),
+			Color:       "#8B5CF6",
 		},
 	}
 
@@ -184,9 +175,6 @@ func TestBudgetIntegration_GetBudget(t *testing.T) {
 		UserID:      user.ID,
 		Category:    "Shopping",
 		LimitAmount: 10000.00,
-		SpentAmount: 3000.00,
-		Period:      "monthly",
-		StartDate:   time.Now(),
 		Color:       "#10B981",
 	}
 	testDB.Create(&budget)
@@ -257,10 +245,8 @@ func TestBudgetIntegration_UpdateBudget(t *testing.T) {
 		UserID:         user.ID,
 		Category:       "Utilities",
 		LimitAmount:    8000.00,
-		SpentAmount:    2000.00,
-		Period:         "monthly",
 		AlertThreshold: 75,
-		StartDate:      time.Now(),
+		Color:          "#F59E0B",
 	}
 	testDB.Create(&budget)
 
@@ -343,25 +329,19 @@ func TestBudgetIntegration_GetBudgetSummary(t *testing.T) {
 			UserID:      user.ID,
 			Category:    "Food",
 			LimitAmount: 15000.00,
-			SpentAmount: 12000.00, // 80% spent (near limit)
-			Period:      "monthly",
-			StartDate:   time.Now(),
+			Color:       "#10B981",
 		},
 		{
 			UserID:      user.ID,
 			Category:    "Transport",
 			LimitAmount: 5000.00,
-			SpentAmount: 6000.00, // 120% spent (over budget)
-			Period:      "monthly",
-			StartDate:   time.Now(),
+			Color:       "#3B82F6",
 		},
 		{
 			UserID:      user.ID,
 			Category:    "Entertainment",
 			LimitAmount: 3000.00,
-			SpentAmount: 1000.00, // 33% spent (safe)
-			Period:      "monthly",
-			StartDate:   time.Now(),
+			Color:       "#8B5CF6",
 		},
 	}
 
@@ -425,8 +405,7 @@ func TestBudgetIntegration_DeleteBudget(t *testing.T) {
 		UserID:      user.ID,
 		Category:    "To Delete",
 		LimitAmount: 5000.00,
-		Period:      "monthly",
-		StartDate:   time.Now(),
+		Color:       "#EF4444",
 	}
 	testDB.Create(&budget)
 

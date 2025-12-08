@@ -262,13 +262,16 @@ func TestGoalIntegration_ListGoals(t *testing.T) {
 	user, token := createTestUser(t, "listgoal@example.com")
 
 	// Create test goals
+	deadline1 := time.Now().AddDate(0, 3, 0)
+	deadline2 := time.Now().AddDate(0, 6, 0)
+
 	goals := []models.SavingGoal{
 		{
 			UserID:        user.ID,
 			Name:          "Laptop",
 			TargetAmount:  50000.00,
 			CurrentAmount: 10000.00,
-			Deadline:      time.Now().AddDate(0, 3, 0),
+			Deadline:      &deadline1,
 			Status:        "in_progress",
 		},
 		{
@@ -276,7 +279,7 @@ func TestGoalIntegration_ListGoals(t *testing.T) {
 			Name:          "Vacation",
 			TargetAmount:  30000.00,
 			CurrentAmount: 5000.00,
-			Deadline:      time.Now().AddDate(0, 6, 0),
+			Deadline:      &deadline2,
 			Status:        "in_progress",
 		},
 	}
@@ -315,12 +318,13 @@ func TestGoalIntegration_UpdateProgress(t *testing.T) {
 	user, token := createTestUser(t, "progress@example.com")
 
 	// Create a test goal
+	deadline := time.Now().AddDate(0, 3, 0)
 	goal := models.SavingGoal{
 		UserID:        user.ID,
 		Name:          "Test Goal",
 		TargetAmount:  10000.00,
 		CurrentAmount: 2000.00,
-		Deadline:      time.Now().AddDate(0, 3, 0),
+		Deadline:      &deadline,
 		Status:        "in_progress",
 	}
 	testDB.Create(&goal)
@@ -393,12 +397,13 @@ func TestGoalIntegration_DeleteGoal(t *testing.T) {
 	user, token := createTestUser(t, "deletegoal@example.com")
 
 	// Create a test goal
+	deadline := time.Now().AddDate(0, 2, 0)
 	goal := models.SavingGoal{
 		UserID:        user.ID,
 		Name:          "To Delete",
 		TargetAmount:  5000.00,
 		CurrentAmount: 1000.00,
-		Deadline:      time.Now().AddDate(0, 2, 0),
+		Deadline:      &deadline,
 		Status:        "in_progress",
 	}
 	testDB.Create(&goal)

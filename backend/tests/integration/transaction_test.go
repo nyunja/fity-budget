@@ -49,9 +49,6 @@ func TestTransactionIntegration_CreateTransaction(t *testing.T) {
 				if transaction.Amount != 500.00 {
 					t.Errorf("Expected amount 500.00, got %f", transaction.Amount)
 				}
-				if transaction.Type != "expense" {
-					t.Errorf("Expected type 'expense', got '%s'", transaction.Type)
-				}
 
 				// Verify wallet balance was updated
 				var updatedWallet models.Wallet
@@ -155,31 +152,34 @@ func TestTransactionIntegration_ListTransactions(t *testing.T) {
 	// Create some test transactions
 	transactions := []models.Transaction{
 		{
-			UserID:      user.ID,
-			WalletID:    wallet.ID,
-			Type:        "expense",
-			Amount:      500.00,
-			Category:    "Food",
-			Description: "Groceries",
-			Date:        time.Now(),
+			UserID:          user.ID,
+			WalletID:        &wallet.ID,
+			Amount:          500.00,
+			Name:            "Groceries",
+			Method:          "Cash",
+			Category:        "Food",
+			Notes:           "Weekly groceries",
+			TransactionDate: time.Now(),
 		},
 		{
-			UserID:      user.ID,
-			WalletID:    wallet.ID,
-			Type:        "income",
-			Amount:      3000.00,
-			Category:    "Salary",
-			Description: "Monthly salary",
-			Date:        time.Now(),
+			UserID:          user.ID,
+			WalletID:        &wallet.ID,
+			Amount:          3000.00,
+			Name:            "Monthly salary",
+			Method:          "Bank Transfer",
+			Category:        "Salary",
+			Notes:           "Monthly salary",
+			TransactionDate: time.Now(),
 		},
 		{
-			UserID:      user.ID,
-			WalletID:    wallet.ID,
-			Type:        "expense",
-			Amount:      200.00,
-			Category:    "Transport",
-			Description: "Uber",
-			Date:        time.Now(),
+			UserID:          user.ID,
+			WalletID:        &wallet.ID,
+			Amount:          200.00,
+			Name:            "Uber ride",
+			Method:          "Credit Card",
+			Category:        "Transport",
+			Notes:           "Uber",
+			TransactionDate: time.Now(),
 		},
 	}
 
@@ -278,13 +278,14 @@ func TestTransactionIntegration_GetTransaction(t *testing.T) {
 
 	// Create a test transaction
 	transaction := models.Transaction{
-		UserID:      user.ID,
-		WalletID:    wallet.ID,
-		Type:        "expense",
-		Amount:      500.00,
-		Category:    "Food",
-		Description: "Test transaction",
-		Date:        time.Now(),
+		UserID:          user.ID,
+		WalletID:        &wallet.ID,
+		Amount:          500.00,
+		Name:            "Test transaction",
+		Method:          "Cash",
+		Category:        "Food",
+		Notes:           "Test transaction",
+		TransactionDate: time.Now(),
 	}
 	testDB.Create(&transaction)
 
@@ -366,13 +367,14 @@ func TestTransactionIntegration_UpdateTransaction(t *testing.T) {
 
 	// Create a test transaction
 	transaction := models.Transaction{
-		UserID:      user.ID,
-		WalletID:    wallet.ID,
-		Type:        "expense",
-		Amount:      500.00,
-		Category:    "Food",
-		Description: "Original description",
-		Date:        time.Now(),
+		UserID:          user.ID,
+		WalletID:        &wallet.ID,
+		Amount:          500.00,
+		Name:            "Original transaction",
+		Method:          "Cash",
+		Category:        "Food",
+		Notes:           "Original description",
+		TransactionDate: time.Now(),
 	}
 	testDB.Create(&transaction)
 
@@ -399,8 +401,8 @@ func TestTransactionIntegration_UpdateTransaction(t *testing.T) {
 				// Verify transaction was updated in database
 				var updatedTransaction models.Transaction
 				testDB.First(&updatedTransaction, transaction.ID)
-				if updatedTransaction.Description != "Updated description" {
-					t.Errorf("Expected description 'Updated description', got '%s'", updatedTransaction.Description)
+				if updatedTransaction.Notes != "Updated description" {
+					t.Errorf("Expected notes 'Updated description', got '%s'", updatedTransaction.Notes)
 				}
 				if updatedTransaction.Amount != 600.00 {
 					t.Errorf("Expected amount 600.00, got %f", updatedTransaction.Amount)
@@ -459,13 +461,14 @@ func TestTransactionIntegration_DeleteTransaction(t *testing.T) {
 
 	// Create a test transaction
 	transaction := models.Transaction{
-		UserID:      user.ID,
-		WalletID:    wallet.ID,
-		Type:        "expense",
-		Amount:      500.00,
-		Category:    "Food",
-		Description: "To be deleted",
-		Date:        time.Now(),
+		UserID:          user.ID,
+		WalletID:        &wallet.ID,
+		Amount:          500.00,
+		Name:            "To be deleted",
+		Method:          "Cash",
+		Category:        "Food",
+		Notes:           "To be deleted",
+		TransactionDate: time.Now(),
 	}
 	testDB.Create(&transaction)
 
