@@ -1,11 +1,14 @@
 import { useAPI } from '../useAPI';
 import { analyticsAPI } from '../../services/api';
 import { StatMetric } from '../../types';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const useDashboardStats = () => {
+  const { isAuthenticated } = useAuth();
+
   const { data: dashboardData, loading, error } = useAPI<{ stats: StatMetric[] }>(
     () => analyticsAPI.getDashboard(),
-    { auto: true }
+    { auto: isAuthenticated }
   );
 
   // Create default stats if backend returns empty data

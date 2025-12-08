@@ -19,12 +19,14 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({ data }) => {
       <div className="space-y-6">
         {data.length > 0 ? (
           data.map((goal) => {
-            const percentage = goal.target > 0 ? Math.round((goal.current / goal.target) * 100) : 0;
+            const target = goal.target || 0;
+            const current = goal.current || 0;
+            const percentage = target > 0 ? Math.round((current / target) * 100) : 0;
             return (
                 <div key={goal.id}>
                     <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium text-gray-900 dark:text-white">{goal.name}</span>
-                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">${goal.target.toLocaleString()}</span>
+                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">${target.toLocaleString()}</span>
                     </div>
                     {/* Progress Bar Container */}
                     <div className="h-8 w-full bg-gray-50 dark:bg-gray-700 rounded-lg relative overflow-hidden flex items-center px-2">
