@@ -1,0 +1,255 @@
+
+import React, { useState, useEffect } from 'react';
+import { Wallet } from 'lucide-react';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import StatCard from './components/StatCard';
+import MoneyFlowChart from './components/MoneyFlowChart';
+import BudgetChart from './components/BudgetChart';
+import TransactionList from './components/TransactionList';
+import SavingGoals from './components/SavingGoals';
+import Login from './components/Login';
+import Register from './components/Register';
+import Onboarding from './components/Onboarding';
+import TransactionsPage from './components/TransactionsPage';
+import GoalsPage from './components/GoalsPage';
+import BudgetPage from './components/BudgetPage';
+import SettingsPage from './components/SettingsPage';
+import AnalyticsPage from './components/AnalyticsPage';
+import WalletPage from './components/WalletPage';
+import HelpPage from './components/HelpPage';
+import { STATS, SAVING_GOALS, MONEY_FLOW_DATA, BUDGET_DATA, USER_NAME, ALL_TRANSACTIONS, INITIAL_BUDGETS, INITIAL_WALLETS } from './constants';
+import { getFinancialInsights } from './services/geminiService';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { User, StatMetric, Transaction, SavingGoal, MoneyFlowData, BudgetCategory, ViewState, Budget, WalletAccount } from './types';
+import { useAPI } from './hooks/useAPI';
+import { analyticsAPI, transactionsAPI, goalsAPI, budgetsAPI, walletsAPI } from './services/api';
+
+// Main App Content Component
+const AppContent: React.FC = () => {
+  const { user, isAuthenticated, login, logout, register } = useAuth();
+
+  // App State
+  const [view, setView] = useState<ViewState>('login');
+  const [insight, setInsight] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  // Fetch Dashboard Data
+  const { data: dashboardData } = useAPI<{ stats: StatMetric[] }>(
+    () => analyticsAPI.getDashboard(),
+    { auto: isAuthenticated }
+  );
+
+  const { data: moneyFlowData } = useAPI<{ flow: MoneyFlowData[] }>(
+    () => analyticsAPI.getMoneyFlow(),
+    { auto: isAuthenticated }
+  );
+
+  const { data: budgetSummary } = useAPI<{ categories: BudgetCategory[] }>(
+    () => budgetsAPI.getSummary(),
+    { auto: isAuthenticated }
+  );
+
+  const { data: recentTransactions } = useAPI<{ transactions: Transaction[] }>(
+    () => transactionsAPI.list({ limit: 5 }),
+    { auto: isAuthenticated }
+  );
+
+  const { data: goalsData } = useAPI<{ goals: SavingGoal[] }>(
+    () => goalsAPI.list(),
+    { auto: isAuthenticated }
+  );
+
+  // Derived State
+  const stats = dashboardData?.stats || STATS;
+  const moneyFlow = moneyFlowData?.flow || MONEY_FLOW_DATA;
+  const budget = budgetSummary?.categories || BUDGET_DATA;
+  const transactions = recentTransactions?.transactions || [];
+  const goals = goalsData?.goals || [];
+
+  // Effect to redirect based on auth status
+  useEffect(() => {
+    if (isAuthenticated && (view === 'login' || view === 'register')) {
+      setView('dashboard');
+    } else if (!isAuthenticated && view !== 'register' && view !== 'onboarding') {
+      setView('login');
+    }
+  }, [isAuthenticated, view]);
+
+  // Dark Mode Effect
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  // -- Handlers --
+
+  const handleLogin = () => {
+    // Login is already handled by AuthContext, just update view
+    setView('dashboard');
+  };
+
+  const handleRegister = () => {
+    // Registration successful, move to onboarding
+    setView('onboarding');
+  };
+
+  const handleOnboardingComplete = async (data: { income: number; goalName: string; goalAmount: number }) => {
+    // Call API to complete onboarding
+    // For now, just redirect to dashboard
+    setView('dashboard');
+  };
+
+  const handleLogout = () => {
+    logout();
+    setView('login');
+  };
+
+  const handleGenerateInsights = async () => {
+    setIsGenerating(true);
+    setInsight(null);
+    try {
+      const result = await getFinancialInsights(stats, transactions, goals);
+      setInsight(result);
+    } catch (error) {
+      setInsight("Unable to retrieve insights.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // Placeholder handlers for dashboard interactions (if any)
+  const handleAddTransaction = () => { };
+  const handleAddGoal = () => { };
+  const handleUpdateGoal = () => { };
+  const handleDeleteGoal = () => { };
+  const handleAddBudget = () => { };
+  const handleUpdateBudget = () => { };
+  const handleDeleteBudget = () => { };
+  const handleAddWallet = () => { };
+  const handleUpdateWallet = () => { };
+  const handleDeleteWallet = () => { };
+
+  // Auth Views
+  if (view === 'login') return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
+  if (view === 'register') return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
+  if (view === 'onboarding') return <Onboarding onComplete={handleOnboardingComplete} userName={user?.name || 'User'} />;
+
+  // Main App Layout
+  return (
+    <div className="flex bg-[#F8F9FD] dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100 transition-colors duration-200">
+      <Sidebar
+        onLogout={handleLogout}
+        isDarkMode={darkMode}
+        toggleTheme={() => setDarkMode(!darkMode)}
+        currentView={view}
+        onNavigate={setView}
+      />
+
+      <div className="flex-1 lg:ml-64 relative">
+        {/* Sticky Header Container with Blur */}
+        <div className="sticky top-0 z-10 bg-[#F8F9FD]/90 dark:bg-gray-900/90 backdrop-blur-md p-4 md:p-8 pb-4">
+          {user && (
+            <Header
+              user={user}
+              onGenerateInsights={handleGenerateInsights}
+              isGenerating={isGenerating}
+              insight={insight}
+            />
+          )}
+        </div>
+
+        {/* Scrollable Content Area */}
+        <div className="px-4 md:px-8 pb-8 min-h-[calc(100vh-140px)]">
+
+          {/* Dashboard View */}
+          {view === 'dashboard' && (
+            <div className="space-y-6 animate-fade-in">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                {stats.map((stat, index) => (
+                  <StatCard key={index} {...stat} />
+                ))}
+              </div>
+
+              {/* Main Charts Row */}
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2 h-[400px]">
+                  <MoneyFlowChart data={moneyFlow} />
+                </div>
+                <div className="xl:col-span-1 h-[400px]">
+                  <BudgetChart data={budget} />
+                </div>
+              </div>
+
+              {/* Bottom Row */}
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                <div className="xl:col-span-2">
+                  <TransactionList data={transactions.slice(0, 5)} />
+                </div>
+                <div className="xl:col-span-1">
+                  <SavingGoals data={goals.slice(0, 4)} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Transactions View */}
+          {view === 'transactions' && (
+            <TransactionsPage />
+          )}
+
+          {/* Goals View */}
+          {view === 'goals' && (
+            <GoalsPage />
+          )}
+
+          {/* Budget View */}
+          {view === 'budget' && (
+            <BudgetPage />
+          )}
+
+          {/* Analytics View */}
+          {view === 'analytics' && (
+            <AnalyticsPage />
+          )}
+
+          {/* Settings View */}
+          {view === 'settings' && user && (
+            <SettingsPage
+              user={user}
+              isDarkMode={darkMode}
+              toggleTheme={() => setDarkMode(!darkMode)}
+              onLogout={handleLogout}
+            />
+          )}
+
+          {/* Wallet View */}
+          {view === 'wallet' && (
+            <WalletPage />
+          )}
+
+          {/* Help View */}
+          {view === 'help' && (
+            <HelpPage />
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+};
+
+export default App;
