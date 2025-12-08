@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 // LoggerMiddleware logs HTTP requests with timing information
@@ -26,7 +27,9 @@ func LoggerMiddleware() gin.HandlerFunc {
 		// Get user ID if available
 		userID := "anonymous"
 		if uid, exists := c.Get("userID"); exists {
-			userID = uid.(string)
+			if uuidVal, ok := uid.(uuid.UUID); ok {
+				userID = uuidVal.String()
+			}
 		}
 
 		// Log the request
