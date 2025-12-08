@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Testing Configuration Loading ===\n")
+	fmt.Println("=== Testing Configuration Loading ===")
 
 	// Load configuration
 	cfg := config.Load()
@@ -34,7 +34,7 @@ func main() {
 	fmt.Println("\n--- CORS Configuration ---")
 	fmt.Printf("Allowed Origins: %v\n", cfg.CORS.Origins)
 
-	fmt.Println("\n=== Testing Database Connection ===\n")
+	fmt.Println("\n=== Testing Database Connection ===")
 
 	// Test database connection
 	db, err := config.ConnectDB(cfg)

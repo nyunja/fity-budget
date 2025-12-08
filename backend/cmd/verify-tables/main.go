@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Verifying Database Tables ===\n")
+	fmt.Println("=== Verifying Database Tables ===")
 
 	// Load configuration
 	cfg := config.Load()
@@ -56,7 +56,7 @@ func main() {
 
 	// Verify specific tables
 	expectedTables := []string{"users", "wallets", "transactions", "saving_goals", "budgets"}
-	fmt.Println("=== Verification Results ===\n")
+	fmt.Println("=== Verification Results ===")
 
 	allFound := true
 	for _, expected := range expectedTables {

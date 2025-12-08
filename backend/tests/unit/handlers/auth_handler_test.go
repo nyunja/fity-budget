@@ -442,6 +442,7 @@ func TestAuthHandler_CompleteOnboarding(t *testing.T) {
 
 	tests := []struct {
 		name           string
+		requestBody    interface{}
 		setupContext   func(*gin.Context)
 		mockSetup      func(*mocks.MockAuthService)
 		expectedStatus int
@@ -449,11 +450,15 @@ func TestAuthHandler_CompleteOnboarding(t *testing.T) {
 	}{
 		{
 			name: "successful onboarding completion",
+			requestBody: map[string]interface{}{
+				"monthly_income": 5000.0,
+				"currency":       "USD",
+			},
 			setupContext: func(c *gin.Context) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockAuthService) {
-				m.CompleteOnboardingFunc = func(id uuid.UUID) error {
+				m.CompleteOnboardingFunc = func(id uuid.UUID, monthlyIncome float64, currency string) error {
 					return nil
 				}
 			},
@@ -466,11 +471,15 @@ func TestAuthHandler_CompleteOnboarding(t *testing.T) {
 		},
 		{
 			name: "onboarding failure",
+			requestBody: map[string]interface{}{
+				"monthly_income": 5000.0,
+				"currency":       "USD",
+			},
 			setupContext: func(c *gin.Context) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockAuthService) {
-				m.CompleteOnboardingFunc = func(id uuid.UUID) error {
+				m.CompleteOnboardingFunc = func(id uuid.UUID, monthlyIncome float64, currency string) error {
 					return errors.New("user not found")
 				}
 			},
@@ -497,7 +506,7 @@ func TestAuthHandler_CompleteOnboarding(t *testing.T) {
 			})
 
 			// Execute
-			w := testutils.MakeRequest(router, "POST", "/onboarding", nil, nil)
+			w := testutils.MakeRequest(router, "POST", "/onboarding", tt.requestBody, nil)
 
 			// Assert
 			if w.Code != tt.expectedStatus {

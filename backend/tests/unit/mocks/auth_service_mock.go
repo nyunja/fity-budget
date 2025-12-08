@@ -11,7 +11,7 @@ type MockAuthService struct {
 	LoginFunc              func(email, password string) (*models.User, string, error)
 	GetUserByIDFunc        func(id uuid.UUID) (*models.User, error)
 	UpdateProfileFunc      func(id uuid.UUID, name, email string) (*models.User, error)
-	CompleteOnboardingFunc func(id uuid.UUID) error
+	CompleteOnboardingFunc func(id uuid.UUID, monthlyIncome float64, currency string) error
 }
 
 func (m *MockAuthService) Register(name, email, password string) (*models.User, string, error) {
@@ -42,9 +42,9 @@ func (m *MockAuthService) UpdateProfile(id uuid.UUID, name, email string) (*mode
 	return nil, nil
 }
 
-func (m *MockAuthService) CompleteOnboarding(id uuid.UUID) error {
+func (m *MockAuthService) CompleteOnboarding(id uuid.UUID, monthlyIncome float64, currency string) error {
 	if m.CompleteOnboardingFunc != nil {
-		return m.CompleteOnboardingFunc(id)
+		return m.CompleteOnboardingFunc(id, monthlyIncome, currency)
 	}
 	return nil
 }
