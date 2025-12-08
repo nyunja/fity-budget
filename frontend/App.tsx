@@ -23,7 +23,7 @@ import { getFinancialInsights } from './services/geminiService';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { User, StatMetric, Transaction, SavingGoal, MoneyFlowData, BudgetCategory, ViewState, Budget, WalletAccount } from './types';
 import { useAPI } from './hooks/useAPI';
-import { analyticsAPI, transactionsAPI, goalsAPI, budgetsAPI, walletsAPI } from './services/api';
+import { analyticsAPI, transactionsAPI, goalsAPI, budgetsAPI, walletsAPI, authAPI } from './services/api';
 
 // Main App Content Component
 const AppContent: React.FC = () => {
@@ -99,9 +99,51 @@ const AppContent: React.FC = () => {
   };
 
   const handleOnboardingComplete = async (data: { income: number; goalName: string; goalAmount: number }) => {
-    // Call API to complete onboarding
-    // For now, just redirect to dashboard
-    setView('dashboard');
+    try {
+      // 1. Create the saving goal
+      if (data.goalName && data.goalAmount > 0) {
+        try {
+          await goalsAPI.create({
+            name: data.goalName,
+            target_amount: data.goalAmount,
+            deadline: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(), // Default 1 year deadline
+            category: 'General',
+            color: '#4F46E5', // Default color
+            icon: 'target' // Default icon
+          });
+        } catch (goalError) {
+          console.error('Failed to create goal:', goalError);
+          // Import toast dynamically to avoid circular dependencies
+          const { toast } = await import('./utils/toast');
+          toast.error('Failed to create your savings goal. You can add it later from the Goals page.');
+          // Continue with onboarding even if goal creation fails
+        }
+      }
+
+      // 2. Complete onboarding on backend
+      try {
+        await authAPI.completeOnboarding({
+          monthly_income: data.income,
+          currency: 'USD',
+          financial_goals: [data.goalName]
+        });
+      } catch (onboardingError) {
+        console.error('Failed to complete onboarding:', onboardingError);
+        const { toast } = await import('./utils/toast');
+        toast.error('Failed to complete onboarding. Please try again.');
+        // Don't redirect if onboarding fails
+        return;
+      }
+
+      // 3. Show success message and redirect to dashboard
+      const { toast } = await import('./utils/toast');
+      toast.success('Welcome! Your account is all set up.');
+      setView('dashboard');
+    } catch (error) {
+      console.error('Unexpected error during onboarding:', error);
+      const { toast } = await import('./utils/toast');
+      toast.error('An unexpected error occurred. Please try again.');
+    }
   };
 
   const handleLogout = () => {

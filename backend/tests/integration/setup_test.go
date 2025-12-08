@@ -107,7 +107,7 @@ func setup() {
 
 	// Initialize services
 	jwtExpiry, _ := time.ParseDuration(testConfig.JWT.Expiry)
-	authService := services.NewAuthService(userRepo, testConfig.JWT.Secret, jwtExpiry)
+	authService := services.NewAuthService(userRepo, walletRepo, testConfig.JWT.Secret, jwtExpiry)
 	transactionService := services.NewTransactionService(transactionRepo, walletRepo)
 	goalService := services.NewGoalService(goalRepo)
 	budgetService := services.NewBudgetService(budgetRepo, transactionRepo)

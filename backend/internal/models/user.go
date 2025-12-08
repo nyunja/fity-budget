@@ -8,14 +8,16 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
-	Name         string         `gorm:"type:varchar(255);not null" json:"name"`
-	Email        string         `gorm:"type:varchar(255);not null;uniqueIndex" json:"email"`
-	PasswordHash string         `gorm:"type:varchar(255);not null" json:"-"` // "-" means don't include in JSON
-	IsOnboarded  bool           `gorm:"default:false" json:"is_onboarded"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
+	ID            uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
+	Name          string         `gorm:"type:varchar(255);not null" json:"name"`
+	Email         string         `gorm:"type:varchar(255);not null;uniqueIndex" json:"email"`
+	PasswordHash  string         `gorm:"type:varchar(255);not null" json:"-"` // "-" means don't include in JSON
+	MonthlyIncome float64        `gorm:"type:decimal(15,2);default:0" json:"monthly_income"`
+	Currency      string         `gorm:"type:varchar(3);default:'USD'" json:"currency"`
+	IsOnboarded   bool           `gorm:"default:false" json:"is_onboarded"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// Relationships
 	Transactions []Transaction `gorm:"foreignKey:UserID" json:"transactions,omitempty"`

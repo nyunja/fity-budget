@@ -38,7 +38,7 @@ func main() {
 		jwtExpiry = 15 * time.Minute
 	}
 
-	authService := services.NewAuthService(userRepo, cfg.JWT.Secret, jwtExpiry)
+	authService := services.NewAuthService(userRepo, walletRepo, cfg.JWT.Secret, jwtExpiry)
 	transactionService := services.NewTransactionService(transactionRepo, walletRepo)
 	goalService := services.NewGoalService(goalRepo)
 	budgetService := services.NewBudgetService(budgetRepo, transactionRepo)

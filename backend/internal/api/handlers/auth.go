@@ -34,6 +34,12 @@ type UpdateProfileRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
+type OnboardingRequest struct {
+	MonthlyIncome  float64  `json:"monthly_income" binding:"required,min=0"`
+	Currency       string   `json:"currency" binding:"required,len=3"`
+	FinancialGoals []string `json:"financial_goals"`
+}
+
 // Register creates a new user account
 // POST /api/v1/auth/register
 func (h *AuthHandler) Register(c *gin.Context) {
@@ -131,7 +137,13 @@ func (h *AuthHandler) CompleteOnboarding(c *gin.Context) {
 		return
 	}
 
-	if err := h.authService.CompleteOnboarding(userID); err != nil {
+	var req OnboardingRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Error(c, http.StatusBadRequest, "VALIDATION_ERROR", err.Error())
+		return
+	}
+
+	if err := h.authService.CompleteOnboarding(userID, req.MonthlyIncome, req.Currency); err != nil {
 		utils.Error(c, http.StatusBadRequest, "ONBOARDING_FAILED", err.Error())
 		return
 	}

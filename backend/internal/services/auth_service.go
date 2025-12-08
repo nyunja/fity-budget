@@ -17,20 +17,22 @@ type AuthService interface {
 	Login(email, password string) (*models.User, string, error)
 	GetUserByID(id uuid.UUID) (*models.User, error)
 	UpdateProfile(id uuid.UUID, name, email string) (*models.User, error)
-	CompleteOnboarding(id uuid.UUID) error
+	CompleteOnboarding(id uuid.UUID, monthlyIncome float64, currency string) error
 }
 
 type authService struct {
-	userRepo  repository.UserRepository
-	jwtSecret string
-	jwtExpiry time.Duration
+	userRepo   repository.UserRepository
+	walletRepo repository.WalletRepository
+	jwtSecret  string
+	jwtExpiry  time.Duration
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string, jwtExpiry time.Duration) AuthService {
+func NewAuthService(userRepo repository.UserRepository, walletRepo repository.WalletRepository, jwtSecret string, jwtExpiry time.Duration) AuthService {
 	return &authService{
-		userRepo:  userRepo,
-		jwtSecret: jwtSecret,
-		jwtExpiry: jwtExpiry,
+		userRepo:   userRepo,
+		walletRepo: walletRepo,
+		jwtSecret:  jwtSecret,
+		jwtExpiry:  jwtExpiry,
 	}
 }
 
@@ -107,14 +109,33 @@ func (s *authService) UpdateProfile(id uuid.UUID, name, email string) (*models.U
 	return user, nil
 }
 
-func (s *authService) CompleteOnboarding(id uuid.UUID) error {
+func (s *authService) CompleteOnboarding(id uuid.UUID, monthlyIncome float64, currency string) error {
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {
 		return errors.New("user not found")
 	}
 	user.IsOnboarded = true
+	user.MonthlyIncome = monthlyIncome
+	user.Currency = currency
 	if err := s.userRepo.Update(user); err != nil {
 		return err
 	}
+
+	// Create default wallet for the user
+	defaultWallet := &models.Wallet{
+		UserID:    user.ID,
+		Name:      "Main Wallet",
+		Type:      "Cash",
+		Balance:   0,
+		Currency:  currency,
+		Color:     "#4F46E5",
+		IsDefault: true,
+	}
+	if err := s.walletRepo.Create(defaultWallet); err != nil {
+		// Log error but don't fail onboarding if wallet creation fails
+		// The user can create a wallet manually later
+		return errors.New("failed to create default wallet")
+	}
+
 	return nil
 }
