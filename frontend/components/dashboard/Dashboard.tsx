@@ -1,9 +1,7 @@
 import React from 'react';
-import StatCard from '../StatCard';
-import MoneyFlowChart from '../MoneyFlowChart';
-import BudgetChart from '../BudgetChart';
-import TransactionList from '../TransactionList';
-import SavingGoals from '../SavingGoals';
+import DashboardStats from './DashboardStats';
+import DashboardCharts from './DashboardCharts';
+import DashboardOverview from './DashboardOverview';
 import { useAPI } from '../../hooks/useAPI';
 import { analyticsAPI, transactionsAPI, goalsAPI, budgetsAPI } from '../../services/api';
 import { StatMetric, Transaction, SavingGoal, MoneyFlowData, BudgetCategory } from '../../types';
@@ -53,31 +51,13 @@ const Dashboard: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <StatCard key={index} {...stat} />
-        ))}
-      </div>
+      <DashboardStats stats={stats} />
 
       {/* Main Charts Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2 h-[400px]">
-          <MoneyFlowChart data={moneyFlow} />
-        </div>
-        <div className="xl:col-span-1 h-[400px]">
-          <BudgetChart data={budget} />
-        </div>
-      </div>
+      <DashboardCharts moneyFlow={moneyFlow} budget={budget} />
 
       {/* Bottom Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <div className="xl:col-span-2">
-          <TransactionList data={transactions.slice(0, 5)} />
-        </div>
-        <div className="xl:col-span-1">
-          <SavingGoals data={goals.slice(0, 4)} />
-        </div>
-      </div>
+      <DashboardOverview transactions={transactions} goals={goals} />
     </div>
   );
 };
