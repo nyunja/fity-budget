@@ -18,7 +18,7 @@ export const useTransactions = () => {
       id: tx.id,
       date: formatTransactionDate(tx.transaction_date),
       amount: tx.amount,
-      name: tx.description,
+      name: tx.name,
       method: tx.method,
       category: tx.category,
       status: tx.status || 'Completed',

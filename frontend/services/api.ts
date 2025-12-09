@@ -124,7 +124,8 @@ export const transactionsAPI = {
     type: 'income' | 'expense';
     amount: number;
     category: string;
-    description: string;
+    name: string;
+    method?: string;
     wallet_id: string;
     date: string;
     notes?: string;
@@ -140,7 +141,8 @@ export const transactionsAPI = {
     data: {
       amount?: number;
       category?: string;
-      description?: string;
+      name?: string;
+      method?: string;
       notes?: string;
       date?: string;
     }

@@ -43,7 +43,7 @@ export const useTransactionForm = (
       type: newTxType.toLowerCase() as 'income' | 'expense',
       amount,
       category: newTxCategory,
-      description: newTxName,
+      name: newTxName,
       method: newTxMethod,
       wallet_id: newTxWallet,
       date: new Date().toISOString(),
