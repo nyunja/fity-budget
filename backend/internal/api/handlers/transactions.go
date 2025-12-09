@@ -24,7 +24,7 @@ func NewTransactionHandler(transactionService services.TransactionService) *Tran
 type CreateTransactionRequest struct {
 	WalletID        *uuid.UUID `json:"wallet_id"`
 	Amount          float64    `json:"amount" binding:"required,gt=0"`
-	Description     string     `json:"description" binding:"required"`
+	Name     string     `json:"name" binding:"required"`
 	Method          string     `json:"method"`
 	Category        string     `json:"category" binding:"required"`
 	Status          string     `json:"status" binding:"omitempty,oneof=Completed Pending Failed"`
@@ -35,7 +35,7 @@ type CreateTransactionRequest struct {
 
 type UpdateTransactionRequest struct {
 	Amount          float64    `json:"amount" binding:"omitempty,gt=0"`
-	Description     string     `json:"description"`
+	Name            string     `json:"name"`
 	Method          string     `json:"method"`
 	Category        string     `json:"category"`
 	Status          string     `json:"status" binding:"omitempty,oneof=Completed Pending Failed"`
@@ -66,18 +66,26 @@ func (h *TransactionHandler) ListTransactions(c *gin.Context) {
 
 	offset := (page - 1) * limit
 
-	transactions, err := h.transactionService.GetUserTransactions(userID, limit, offset)
+	transactions, total, err := h.transactionService.GetUserTransactionsWithCount(userID, limit, offset)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "FETCH_FAILED", err.Error())
 		return
 	}
 
-	// TODO: Implement proper pagination metadata
+	// Calculate pagination metadata
+	totalPages := (int(total) + limit - 1) / limit // Ceiling division
+	hasNext := page < totalPages
+	hasPrev := page > 1
+
 	utils.Success(c, http.StatusOK, gin.H{
 		"data": transactions,
 		"pagination": gin.H{
-			"page":  page,
-			"limit": limit,
+			"page":        page,
+			"limit":       limit,
+			"total":       total,
+			"total_pages": totalPages,
+			"has_next":    hasNext,
+			"has_prev":    hasPrev,
 		},
 	})
 }
@@ -135,7 +143,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	serviceReq := services.CreateTransactionRequest{
 		WalletID:        req.WalletID,
 		Amount:          req.Amount,
-		Name:            req.Description,
+		Name:            req.Name,
 		Method:          req.Method,
 		Category:        req.Category,
 		Status:          req.Status,
@@ -185,7 +193,7 @@ func (h *TransactionHandler) UpdateTransaction(c *gin.Context) {
 
 	serviceReq := services.UpdateTransactionRequest{
 		Amount:          req.Amount,
-		Name:            req.Description,
+		Name:            req.Name,
 		Method:          req.Method,
 		Category:        req.Category,
 		Status:          req.Status,

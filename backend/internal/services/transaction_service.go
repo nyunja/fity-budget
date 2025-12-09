@@ -13,6 +13,7 @@ import (
 type TransactionService interface {
 	CreateTransaction(userID uuid.UUID, req CreateTransactionRequest) (*models.Transaction, error)
 	GetUserTransactions(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
+	GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error)
 	GetTransactionByID(id, userID uuid.UUID) (*models.Transaction, error)
 	UpdateTransaction(id, userID uuid.UUID, req UpdateTransactionRequest) (*models.Transaction, error)
 	DeleteTransaction(id, userID uuid.UUID) error
@@ -135,6 +136,31 @@ func (s *transactionService) GetUserTransactions(userID uuid.UUID, limit, offset
 	}
 
 	return transactions, nil
+}
+
+// GetUserTransactionsWithCount retrieves transactions and total count for pagination
+func (s *transactionService) GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+	// Set default limit if not provided or invalid
+	if limit <= 0 {
+		limit = 50
+	}
+	if offset < 0 {
+		offset = 0
+	}
+
+	// Get transactions
+	transactions, err := s.transactionRepo.FindByUserID(userID, limit, offset)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Get total count
+	total, err := s.transactionRepo.CountByUserID(userID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return transactions, total, nil
 }
 
 // GetTransactionByID retrieves a specific transaction by ID

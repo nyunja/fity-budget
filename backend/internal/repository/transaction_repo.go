@@ -11,6 +11,7 @@ type TransactionRepository interface {
 	Create(transaction *models.Transaction) error
 	FindByID(id uuid.UUID) (*models.Transaction, error)
 	FindByUserID(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
+	CountByUserID(userID uuid.UUID) (int64, error)
 	FindAll() ([]*models.Transaction, error)
 	Update(transaction *models.Transaction) error
 	Delete(id uuid.UUID) error
@@ -48,6 +49,12 @@ func (r *transactionRepository) FindByUserID(userID uuid.UUID, limit, offset int
 		return nil, err
 	}
 	return transactions, nil
+}
+
+func (r *transactionRepository) CountByUserID(userID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Transaction{}).Where("user_id = ?", userID).Count(&count).Error
+	return count, err
 }
 
 func (r *transactionRepository) FindAll() ([]*models.Transaction, error) {
