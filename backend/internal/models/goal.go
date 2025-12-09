@@ -11,7 +11,7 @@ type SavingGoal struct {
 	ID            uuid.UUID      `gorm:"type:uuid;primary_key;default:gen_random_uuid()" json:"id"`
 	UserID        uuid.UUID      `gorm:"type:uuid;not null;index" json:"user_id"`
 	Name          string         `gorm:"type:varchar(255);not null" json:"name"`
-	TargetAmount  float64        `gorm:"type:decimal(12,2);not null" json:"target_amount"`
+	TargetAmount  float64        `gorm:"type:decimal(12,2);not null" json:"target"`
 	CurrentAmount float64        `gorm:"type:decimal(12,2);default:0.00" json:"current_amount"`
 	Color         string         `gorm:"type:varchar(20);not null" json:"color"`
 	Icon          string         `gorm:"type:varchar(50)" json:"icon,omitempty"`
