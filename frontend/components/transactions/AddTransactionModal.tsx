@@ -26,7 +26,7 @@ interface AddTransactionModalProps {
     setNotes: (notes: string) => void;
   };
   submitError: string | null;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent) => Promise<void>;
   creating: boolean;
 }
 

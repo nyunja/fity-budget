@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { WalletAccount } from '../../types';
 
 // Hook for managing transaction form state
@@ -17,7 +17,14 @@ export const useTransactionForm = (
   const [newTxNotes, setNewTxNotes] = useState('');
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Update wallet when wallets load
+  useEffect(() => {
+    if (wallets.length > 0 && !newTxWallet) {
+      setNewTxWallet(wallets[0].id);
+    }
+  }, [wallets, newTxWallet]);
+
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     setSubmitError(null);
 
@@ -37,6 +44,7 @@ export const useTransactionForm = (
       amount,
       category: newTxCategory,
       description: newTxName,
+      method: newTxMethod,
       wallet_id: newTxWallet,
       date: new Date().toISOString(),
       notes: newTxNotes || undefined,
