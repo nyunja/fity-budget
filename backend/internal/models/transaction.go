@@ -12,7 +12,7 @@ type Transaction struct {
 	UserID          uuid.UUID      `gorm:"type:uuid;not null;index" json:"user_id"`
 	WalletID        *uuid.UUID     `gorm:"type:uuid;index" json:"wallet_id,omitempty"`
 	Amount          float64        `gorm:"type:decimal(12,2);not null" json:"amount"`
-	Name            string         `gorm:"type:varchar(255);not null" json:"name"`
+	Name            string         `gorm:"column:name;type:varchar(255);not null" json:"description"`
 	Method          string         `gorm:"type:varchar(100);not null" json:"method"`
 	Category        string         `gorm:"type:varchar(100);not null;index" json:"category"`
 	Status          string         `gorm:"type:varchar(20);default:'Completed';index" json:"status"` // Completed, Pending, Failed
