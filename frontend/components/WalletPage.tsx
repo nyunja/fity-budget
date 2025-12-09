@@ -172,22 +172,22 @@ const WalletPage: React.FC = () => {
       <div className="space-y-8 animate-fade-in pb-10">
 
          {/* 1. Top Section - Total Balance */}
-         <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 dark:shadow-none relative overflow-hidden">
+         <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 text-black border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl relative overflow-hidden">
             {/* Decorative Circles */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                <div>
                   <div className="flex items-center gap-3 mb-2">
-                     <span className="text-indigo-200 text-sm font-medium uppercase tracking-wider">Total Balance</span>
-                     <button onClick={() => setShowBalance(!showBalance)} className="text-indigo-300 hover:text-white transition-colors">
+                     <span className="text-black text-sm font-medium uppercase tracking-wider">Total Balance</span>
+                     <button onClick={() => setShowBalance(!showBalance)} className="text-black hover:text-white transition-colors">
                         {showBalance ? <Eye size={16} /> : <EyeOff size={16} />}
                      </button>
                   </div>
                   <h1 className="text-4xl md:text-5xl font-bold mb-2">
                      {showBalance ? `$${totalBalance.toLocaleString()}` : '••••••••'}
                   </h1>
-                  <div className="flex gap-4 text-sm text-indigo-100">
+                  <div className="flex gap-4 text-sm text-black">
                      <span>Available: <span className="font-bold">{showBalance ? `$${totalAvailable.toLocaleString()}` : '••••'}</span></span>
                      <span>•</span>
                      <span>{wallets.length} Active Wallets</span>
@@ -198,14 +198,14 @@ const WalletPage: React.FC = () => {
                <div className="flex gap-3 w-full md:w-auto">
                   <button
                      onClick={() => setIsFormOpen(true)}
-                     className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl font-medium transition-colors border border-white/10"
+                     className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-200 rounded-xl font-bold transition-colors shadow-sm"
                   >
                      <Plus size={18} />
                      <span>Add Money</span>
                   </button>
                   <button
                      onClick={() => setIsTransferOpen(true)}
-                     className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-white text-indigo-900 hover:bg-indigo-50 rounded-xl font-bold transition-colors shadow-sm"
+                     className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-200 rounded-xl font-bold transition-colors shadow-sm"
                   >
                      <ArrowRightLeft size={18} />
                      <span>Transfer</span>
@@ -224,7 +224,7 @@ const WalletPage: React.FC = () => {
                >
                   <div className="flex justify-between items-start mb-6">
                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg ${wallet.color}`}>
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg bg-[${wallet.color}]`}>
                            {getWalletIcon(wallet.type)}
                         </div>
                         <div>
@@ -275,7 +275,7 @@ const WalletPage: React.FC = () => {
                <div className="relative bg-white dark:bg-gray-800 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[80vh] animate-fade-in">
 
                   {/* Left Panel: Wallet Info */}
-                  <div className={`w-full md:w-1/3 ${selectedWallet.color} p-8 text-white flex flex-col justify-between relative overflow-hidden`}>
+                  <div className={`w-full md:w-1/3 bg-[${selectedWallet.color}] p-8 text-white flex flex-col justify-between relative overflow-hidden`}>
                      <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
 
                      <div>
