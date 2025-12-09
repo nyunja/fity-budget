@@ -40,8 +40,15 @@ type CORSConfig struct {
 
 func Load() *Config {
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, using envrironment variables")
+		if err := godotenv.Load("backend/.env"); err != nil {
+			log.Println("No .env file found, using environment variables")
+		} else {
+			log.Println("✓ Loaded .env from backend/.env")
+		}
+	} else {
+		log.Println("✓ Loaded .env from current directory")
 	}
+
 	return &Config{
 		Server: ServerConfig{
 			Port: getEnv("PORT", "8080"),
@@ -51,8 +58,8 @@ func Load() *Config {
 			Host:     getEnv("DB_HOST", "localhost"),
 			Port:     getEnv("DB_PORT", "5432"),
 			User:     getEnv("DB_USER", "postgres"),
-			Password: getEnv("DB_PASSWORD", "postgres"),
-			DBName:   getEnv("DB_NAME", "fity_budget"),
+			Password: getEnv("DB_PASSWORD", "password"),
+			DBName:   getEnv("DB_NAME", "fity_budget_db"),
 			SSLMode:  getEnv("DB_SSLMODE", "disable"),
 		},
 		JWT: JWTConfig{
