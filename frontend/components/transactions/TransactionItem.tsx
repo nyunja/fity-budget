@@ -16,13 +16,13 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, o
       className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer flex items-center justify-between group"
     >
       <div className="flex items-center gap-4">
-        {getTransactionIcon(transaction.name)}
+        {getTransactionIcon(transaction.category)}
         <div>
           <h4 className="font-bold text-gray-900 dark:text-white text-sm md:text-base">{transaction.name}</h4>
           <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             <span className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-300">{transaction.category}</span>
             <span>•</span>
-            <span>{transaction.wallet || transaction.method}</span>
+            <span>{transaction.method}</span>
           </div>
         </div>
       </div>
