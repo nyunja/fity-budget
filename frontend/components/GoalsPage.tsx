@@ -19,9 +19,14 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { useAPI, useMutation } from '../hooks/useAPI';
 import { goalsAPI } from '../services/api';
 
+// Type for the API response from goalsAPI.list()
+interface GoalsListResponse {
+  goals: any[];
+}
+
 const GoalsPage: React.FC = () => {
   // Fetch goals from API
-  const { data: goalsData, loading, error, refetch } = useAPI(
+  const { data: goalsData, loading, error, refetch } = useAPI<GoalsListResponse>(
     () => goalsAPI.list(),
     { auto: true }
   );
@@ -33,7 +38,7 @@ const GoalsPage: React.FC = () => {
 
   // Update goal progress mutation
   const { mutate: updateProgress, loading: updating } = useMutation(
-    goalsAPI.updateProgress
+    ({ id, amount }: { id: string; amount: number }) => goalsAPI.updateProgress(id, amount)
   );
 
   // Delete goal mutation
@@ -48,13 +53,13 @@ const GoalsPage: React.FC = () => {
     return goalsData.goals.map((g: any) => ({
       id: g.id,
       name: g.name,
-      target: g.target_amount,
-      current: g.current_amount,
+      target: g.target, // Backend sends "target"
+      current: g.current_amount, // Backend sends "current_amount"
       deadline: g.deadline,
       priority: g.priority as GoalPriority,
       category: g.category,
       status: g.status,
-      color: 'bg-indigo-500',
+      color: g.color || 'bg-indigo-500',
       createdAt: g.created_at
     }));
   }, [goalsData]);
@@ -119,10 +124,10 @@ const GoalsPage: React.FC = () => {
 
     const result = await createGoal({
       name: formName,
-      target_amount: target,
-      current_amount: current,
+      target: target,
+      current: current,
       deadline: formDeadline,
-      priority: formPriority.toLowerCase() as 'low' | 'medium' | 'high',
+      priority: formPriority.toLowerCase() as GoalPriority,
       category: formCategory,
     });
 
@@ -240,15 +245,15 @@ const GoalsPage: React.FC = () => {
              <div className="w-1/2 h-32">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie 
-                      data={goals} 
-                      dataKey="target" 
-                      nameKey="category" 
-                      cx="50%" 
-                      cy="50%" 
-                      innerRadius={35} 
-                      outerRadius={50} 
-                      fill="#8884d8" 
+                    <Pie
+                      data={goals as any}
+                      dataKey="target"
+                      nameKey="category"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={35}
+                      outerRadius={50}
+                      fill="#8884d8"
                       paddingAngle={5}
                       stroke="none"
                     >
