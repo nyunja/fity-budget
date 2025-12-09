@@ -88,7 +88,7 @@ const AppContent: React.FC = () => {
         try {
           await goalsAPI.create({
             name: data.goalName,
-            target_amount: data.goalAmount,
+            target: data.goalAmount,
             deadline: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(), // Default 1 year deadline
             category: 'General',
             color: '#4F46E5', // Default color
