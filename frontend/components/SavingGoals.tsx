@@ -32,12 +32,12 @@ const SavingGoals: React.FC<SavingGoalsProps> = ({ data }) => {
                     <div className="h-8 w-full bg-gray-50 dark:bg-gray-700 rounded-lg relative overflow-hidden flex items-center px-2">
                          {/* Filled Part */}
                         <div 
-                            className={`absolute left-0 top-0 bottom-0 ${goal.color} opacity-20 rounded-lg transition-all duration-1000`} 
+                            className={`absolute left-0 top-0 bottom-0 bg-indigo-600 dark:bg-indigo-900 opacity-20 rounded-lg transition-all duration-1000`} 
                             style={{ width: `${percentage}%` }}
                         ></div>
                          {/* Solid Indicator Bar */}
                          <div 
-                            className={`absolute left-0 top-0 bottom-0 ${goal.color} rounded-lg transition-all duration-1000`}
+                            className={`absolute left-0 top-0 bottom-0 bg-indigo-600 dark:bg-indigo-900 rounded-lg transition-all duration-1000`}
                             style={{ width: `${percentage * 0.8}%` }} // Visual trick to match design where bar isn't full width of bg
                          ></div>
                          
