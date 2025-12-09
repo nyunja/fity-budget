@@ -10,12 +10,13 @@ import (
 
 // MockTransactionService is a mock implementation of TransactionService
 type MockTransactionService struct {
-	CreateTransactionFunc   func(userID uuid.UUID, req services.CreateTransactionRequest) (*models.Transaction, error)
-	GetUserTransactionsFunc func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
-	GetTransactionByIDFunc  func(id, userID uuid.UUID) (*models.Transaction, error)
-	UpdateTransactionFunc   func(id, userID uuid.UUID, req services.UpdateTransactionRequest) (*models.Transaction, error)
-	DeleteTransactionFunc   func(id, userID uuid.UUID) error
-	GetTransactionStatsFunc func(userID uuid.UUID, startDate, endDate time.Time) (*services.TransactionStats, error)
+	CreateTransactionFunc            func(userID uuid.UUID, req services.CreateTransactionRequest) (*models.Transaction, error)
+	GetUserTransactionsFunc          func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
+	GetUserTransactionsWithCountFunc func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error)
+	GetTransactionByIDFunc           func(id, userID uuid.UUID) (*models.Transaction, error)
+	UpdateTransactionFunc            func(id, userID uuid.UUID, req services.UpdateTransactionRequest) (*models.Transaction, error)
+	DeleteTransactionFunc            func(id, userID uuid.UUID) error
+	GetTransactionStatsFunc          func(userID uuid.UUID, startDate, endDate time.Time) (*services.TransactionStats, error)
 }
 
 func (m *MockTransactionService) CreateTransaction(userID uuid.UUID, req services.CreateTransactionRequest) (*models.Transaction, error) {
@@ -30,6 +31,13 @@ func (m *MockTransactionService) GetUserTransactions(userID uuid.UUID, limit, of
 		return m.GetUserTransactionsFunc(userID, limit, offset)
 	}
 	return nil, nil
+}
+
+func (m *MockTransactionService) GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+	if m.GetUserTransactionsWithCountFunc != nil {
+		return m.GetUserTransactionsWithCountFunc(userID, limit, offset)
+	}
+	return nil, 0, nil
 }
 
 func (m *MockTransactionService) GetTransactionByID(id, userID uuid.UUID) (*models.Transaction, error) {

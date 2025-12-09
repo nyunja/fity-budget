@@ -33,7 +33,7 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockTransactionService) {
-				m.GetUserTransactionsFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error) {
+				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
 					return []*models.Transaction{
 						{
 							ID:              testutils.TestTransactionID,
@@ -44,7 +44,7 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 							Status:          "Completed",
 							TransactionDate: time.Now(),
 						},
-					}, nil
+					}, 1, nil
 				}
 			},
 			expectedStatus: http.StatusOK,
@@ -57,6 +57,13 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 				if len(transactions) != 1 {
 					t.Errorf("Expected 1 transaction, got %d", len(transactions))
 				}
+				pagination := data["pagination"].(map[string]interface{})
+				if pagination["total"].(float64) != 1 {
+					t.Errorf("Expected total to be 1, got %v", pagination["total"])
+				}
+				if pagination["total_pages"].(float64) != 1 {
+					t.Errorf("Expected total_pages to be 1, got %v", pagination["total_pages"])
+				}
 			},
 		},
 		{
@@ -66,17 +73,34 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockTransactionService) {
-				m.GetUserTransactionsFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error) {
+				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
 					if limit != 10 || offset != 10 {
 						t.Errorf("Expected limit=10 and offset=10, got limit=%d, offset=%d", limit, offset)
 					}
-					return []*models.Transaction{}, nil
+					return []*models.Transaction{}, 25, nil
 				}
 			},
 			expectedStatus: http.StatusOK,
 			checkResponse: func(t *testing.T, body map[string]interface{}) {
 				if !body["success"].(bool) {
 					t.Error("Expected success to be true")
+				}
+				data := body["data"].(map[string]interface{})
+				pagination := data["pagination"].(map[string]interface{})
+				if pagination["page"].(float64) != 2 {
+					t.Errorf("Expected page to be 2, got %v", pagination["page"])
+				}
+				if pagination["limit"].(float64) != 10 {
+					t.Errorf("Expected limit to be 10, got %v", pagination["limit"])
+				}
+				if pagination["total"].(float64) != 25 {
+					t.Errorf("Expected total to be 25, got %v", pagination["total"])
+				}
+				if pagination["has_prev"].(bool) != true {
+					t.Error("Expected has_prev to be true")
+				}
+				if pagination["has_next"].(bool) != true {
+					t.Error("Expected has_next to be true")
 				}
 			},
 		},
@@ -87,8 +111,8 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockTransactionService) {
-				m.GetUserTransactionsFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error) {
-					return nil, errors.New("database error")
+				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+					return nil, 0, errors.New("database error")
 				}
 			},
 			expectedStatus: http.StatusInternalServerError,
