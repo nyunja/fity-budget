@@ -12,12 +12,17 @@ interface MoneyFlowResponse {
   };
 }
 
-interface BudgetSummaryResponse {
-  summary: {
-    total_budgets: number;
-    total_limit: number;
-    total_spent: number;
-  };
+interface BudgetListResponse {
+  budgets: Array<{
+    id: string;
+    category: string;
+    limit: number;
+    color: string;
+    icon?: string;
+    is_rollover?: boolean;
+    type?: string;
+    alert_threshold?: number;
+  }>;
 }
 
 export const useDashboardCharts = () => {
@@ -28,8 +33,8 @@ export const useDashboardCharts = () => {
     { auto: isAuthenticated }
   );
 
-  const { data: budgetSummary, loading: budgetLoading, error: budgetError } = useAPI<BudgetSummaryResponse>(
-    () => budgetsAPI.getSummary(),
+  const { data: budgetData, loading: budgetLoading, error: budgetError } = useAPI<BudgetListResponse>(
+    () => budgetsAPI.list(),
     { auto: isAuthenticated }
   );
 
@@ -41,9 +46,12 @@ export const useDashboardCharts = () => {
     savings: moneyFlowData.data.savings_data[index],
   })) || [];
 
-  // For budget, we don't have categories from the summary endpoint
-  // The summary only has totals, so we return empty array for now
-  const budget: BudgetCategory[] = [];
+  // Transform budget data from Budget[] to BudgetCategory[]
+  const budget: BudgetCategory[] = budgetData?.budgets?.map((b) => ({
+    name: b.category,
+    value: b.limit,
+    color: b.color,
+  })) || [];
 
   const loading = moneyFlowLoading || budgetLoading;
   const error = moneyFlowError || budgetError;
