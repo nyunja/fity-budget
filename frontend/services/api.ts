@@ -1,5 +1,7 @@
 // API Client for FityBudget Backend
 
+import { GoalPriority } from "@/types";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
 // Response types from backend
@@ -191,9 +193,11 @@ export const goalsAPI = {
 
   create: async (data: {
     name: string;
-    target_amount: number;
+    target: number;
+    current?:number;
     deadline: string;
     category?: string;
+    priority?: GoalPriority;
     color?: string;
     icon?: string;
   }) => {
