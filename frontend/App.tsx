@@ -7,7 +7,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import Login from './components/Login';
 import Register from './components/Register';
 import Onboarding from './components/Onboarding';
-import TransactionsPage from './components/TransactionsPage';
+import TransactionsPage from './components/transactions/TransactionsPage';
 import GoalsPage from './components/GoalsPage';
 import BudgetPage from './components/BudgetPage';
 import SettingsPage from './components/SettingsPage';
