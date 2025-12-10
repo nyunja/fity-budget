@@ -28,39 +28,15 @@ import {
    Activity,
    Zap
 } from 'lucide-react';
-import { useAPI } from '../hooks/useAPI';
-import { transactionsAPI, goalsAPI, budgetsAPI, analyticsAPI } from '../services/api';
+import { useAnalyticsData, useFinancialMetrics } from '../hooks/analytics/useAnalytics';
+import { OverviewMetrics } from '../components/analytics/OverviewMetrics';
 
 const AnalyticsPage: React.FC = () => {
-   // Fetch data
-   const { data: transactionsData } = useAPI<{ transactions: Transaction[] }>(
-      () => transactionsAPI.list(),
-      { auto: true }
-   );
-
-   const { data: goalsData } = useAPI<{ goals: SavingGoal[] }>(
-      () => goalsAPI.list(),
-      { auto: true }
-   );
-
-   const { data: budgetsData } = useAPI<{ budgets: Budget[] }>(
-      () => budgetsAPI.list(),
-      { auto: true }
-   );
-
-   // We could also fetch specific analytics endpoints if available, but for now we'll calculate from raw data
-   // to match existing logic, or use the analyticsAPI if it provides pre-calculated values.
-   // The existing code calculates metrics on the frontend, so we'll stick to that for now using the fetched lists.
-
-   const transactions = transactionsData?.transactions || [];
-   const goals = goalsData?.goals || [];
-   const budgets = budgetsData?.budgets || [];
+   // Fetch and process data using custom hooks
+   const { transactions, budgets, goals } = useAnalyticsData();
 
    // 1. Overview Metrics
-   const totalIncome = transactions.filter(t => t.amount > 0).reduce((acc, t) => acc + t.amount, 0);
-   const totalExpense = transactions.filter(t => t.amount < 0).reduce((acc, t) => acc + Math.abs(t.amount), 0);
-   const netSavings = totalIncome - totalExpense;
-   const savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : 0;
+   const { totalIncome, totalExpense, netSavings, savingsRate } = useFinancialMetrics(transactions);
 
    // 2. Financial Health Score (Gamification)
    // Logic: Base 50 + Savings Rate + Budget Adherence - Debt/Overspending
@@ -134,45 +110,13 @@ const AnalyticsPage: React.FC = () => {
             </div>
          </div>
 
-         {/* 1. Overview Grid */}
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between h-40">
-               <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium text-sm">Total Income</span>
-                  <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-full text-green-600 dark:text-green-400">
-                     <TrendingUp size={18} />
-                  </div>
-               </div>
-               <div>
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">${totalIncome.toLocaleString()}</h3>
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-medium">+12% vs last month</p>
-               </div>
-            </div>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between h-40">
-               <div className="flex justify-between">
-                  <span className="text-gray-500 dark:text-gray-400 font-medium text-sm">Total Expenses</span>
-                  <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-full text-red-600 dark:text-red-400">
-                     <TrendingDown size={18} />
-                  </div>
-               </div>
-               <div>
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">${totalExpense.toLocaleString()}</h3>
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">+5% vs last month</p>
-               </div>
-            </div>
-            <div className="bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 rounded-3xl shadow-lg shadow-indigo-200 dark:shadow-none flex flex-col justify-between h-40 text-white">
-               <div className="flex justify-between">
-                  <span className="text-indigo-100 font-medium text-sm">Net Savings</span>
-                  <div className="p-2 bg-white/20 rounded-full text-white">
-                     <Target size={18} />
-                  </div>
-               </div>
-               <div>
-                  <h3 className="text-3xl font-bold">${netSavings.toLocaleString()}</h3>
-                  <p className="text-xs text-indigo-100 mt-1 opacity-80">{savingsRate.toFixed(1)}% savings rate</p>
-               </div>
-            </div>
-         </div>
+         {/* Overview Grid */}
+         <OverviewMetrics
+            totalIncome={totalIncome}
+            totalExpense={totalExpense}
+            netSavings={netSavings}
+            savingsRate={savingsRate}
+         />
 
          {/* 2. Main Charts Row */}
          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
