@@ -1,0 +1,1780 @@
+basePath: /api/v1
+definitions:
+  handlers.CreateBudgetRequest:
+    properties:
+      alert_threshold:
+        maximum: 100
+        minimum: 0
+        type: integer
+      category:
+        type: string
+      color:
+        type: string
+      icon:
+        type: string
+      is_rollover:
+        type: boolean
+      limit:
+        type: number
+      type:
+        enum:
+        - Fixed
+        - Variable
+        type: string
+    required:
+    - category
+    - color
+    - limit
+    type: object
+  handlers.CreateGoalRequest:
+    properties:
+      category:
+        type: string
+      color:
+        type: string
+      current:
+        minimum: 0
+        type: number
+      deadline:
+        type: string
+      icon:
+        type: string
+      name:
+        type: string
+      priority:
+        enum:
+        - High
+        - Medium
+        - Low
+        type: string
+      status:
+        enum:
+        - Active
+        - Paused
+        - Completed
+        type: string
+      target:
+        type: number
+    required:
+    - color
+    - name
+    - target
+    type: object
+  handlers.CreateTransactionRequest:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      method:
+        type: string
+      name:
+        type: string
+      notes:
+        type: string
+      receipt_url:
+        type: string
+      status:
+        enum:
+        - Completed
+        - Pending
+        - Failed
+        type: string
+      transaction_date:
+        type: string
+      wallet_id:
+        type: string
+    required:
+    - amount
+    - category
+    - name
+    type: object
+  handlers.CreateWalletRequest:
+    properties:
+      account_number:
+        type: string
+      balance:
+        minimum: 0
+        type: number
+      color:
+        type: string
+      currency:
+        type: string
+      is_default:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+    required:
+    - color
+    - name
+    - type
+    type: object
+  handlers.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handlers.OnboardingRequest:
+    properties:
+      currency:
+        type: string
+      financial_goals:
+        items:
+          type: string
+        type: array
+      monthly_income:
+        minimum: 0
+        type: number
+    required:
+    - currency
+    - monthly_income
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  handlers.UpdateBudgetRequest:
+    properties:
+      alert_threshold:
+        maximum: 100
+        minimum: 0
+        type: integer
+      category:
+        type: string
+      color:
+        type: string
+      icon:
+        type: string
+      is_rollover:
+        type: boolean
+      limit:
+        type: number
+      type:
+        enum:
+        - Fixed
+        - Variable
+        type: string
+    type: object
+  handlers.UpdateGoalRequest:
+    properties:
+      category:
+        type: string
+      color:
+        type: string
+      current:
+        minimum: 0
+        type: number
+      deadline:
+        type: string
+      icon:
+        type: string
+      name:
+        type: string
+      priority:
+        enum:
+        - High
+        - Medium
+        - Low
+        type: string
+      status:
+        enum:
+        - Active
+        - Paused
+        - Completed
+        type: string
+      target:
+        type: number
+    type: object
+  handlers.UpdateProfileRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+    required:
+    - email
+    - name
+    type: object
+  handlers.UpdateProgressRequest:
+    properties:
+      amount:
+        type: number
+    required:
+    - amount
+    type: object
+  handlers.UpdateTransactionRequest:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      method:
+        type: string
+      name:
+        type: string
+      notes:
+        type: string
+      receipt_url:
+        type: string
+      status:
+        enum:
+        - Completed
+        - Pending
+        - Failed
+        type: string
+      transaction_date:
+        type: string
+    type: object
+  handlers.UpdateWalletRequest:
+    properties:
+      account_number:
+        type: string
+      balance:
+        minimum: 0
+        type: number
+      color:
+        type: string
+      currency:
+        type: string
+      is_default:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  models.Budget:
+    properties:
+      alert_threshold:
+        description: Percentage (0-100)
+        type: integer
+      category:
+        type: string
+      color:
+        type: string
+      created_at:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      is_rollover:
+        type: boolean
+      limit:
+        type: number
+      type:
+        description: Fixed, Variable
+        type: string
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      user_id:
+        type: string
+    type: object
+  models.SavingGoal:
+    properties:
+      category:
+        type: string
+      color:
+        type: string
+      created_at:
+        type: string
+      current_amount:
+        type: number
+      deadline:
+        type: string
+      icon:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      priority:
+        description: High, Medium, Low
+        type: string
+      status:
+        description: Active, Paused, Completed
+        type: string
+      target:
+        type: number
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      user_id:
+        type: string
+    type: object
+  models.Transaction:
+    properties:
+      amount:
+        type: number
+      category:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      method:
+        type: string
+      name:
+        type: string
+      notes:
+        type: string
+      receipt_url:
+        type: string
+      status:
+        description: Completed, Pending, Failed
+        type: string
+      transaction_date:
+        type: string
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      user_id:
+        type: string
+      wallet:
+        $ref: '#/definitions/models.Wallet'
+      wallet_id:
+        type: string
+    type: object
+  models.User:
+    properties:
+      budgets:
+        items:
+          $ref: '#/definitions/models.Budget'
+        type: array
+      created_at:
+        type: string
+      currency:
+        type: string
+      email:
+        type: string
+      goals:
+        items:
+          $ref: '#/definitions/models.SavingGoal'
+        type: array
+      id:
+        type: string
+      is_onboarded:
+        type: boolean
+      monthly_income:
+        type: number
+      name:
+        type: string
+      transactions:
+        description: Relationships
+        items:
+          $ref: '#/definitions/models.Transaction'
+        type: array
+      updated_at:
+        type: string
+      wallets:
+        items:
+          $ref: '#/definitions/models.Wallet'
+        type: array
+    type: object
+  models.Wallet:
+    properties:
+      account_number:
+        type: string
+      balance:
+        type: number
+      color:
+        type: string
+      created_at:
+        type: string
+      currency:
+        type: string
+      id:
+        type: string
+      is_default:
+        type: boolean
+      last_synced:
+        type: string
+      name:
+        type: string
+      transactions:
+        items:
+          $ref: '#/definitions/models.Transaction'
+        type: array
+      type:
+        description: Mobile Money, Bank, Cash, Credit, Savings
+        type: string
+      updated_at:
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/models.User'
+        description: Relationships
+      user_id:
+        type: string
+    type: object
+  utils.ErrorInfo:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    type: object
+  utils.Response:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/utils.ErrorInfo'
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@fitybudget.com
+    name: API Support
+  description: Personal Finance Management API - Track expenses, manage budgets, and
+    achieve savings goals
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: FityBudget API
+  version: "1.0"
+paths:
+  /analytics/dashboard:
+    get:
+      consumes:
+      - application/json
+      description: Get comprehensive financial statistics for the dashboard
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    dashboard:
+                      type: object
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get dashboard statistics
+      tags:
+      - analytics
+  /analytics/health:
+    get:
+      consumes:
+      - application/json
+      description: Get overall financial health score with detailed metrics
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    health_score:
+                      type: object
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get financial health score
+      tags:
+      - analytics
+  /analytics/insights:
+    get:
+      consumes:
+      - application/json
+      description: Get AI-generated financial insights and recommendations
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    generated_at:
+                      type: string
+                    health_score:
+                      type: object
+                    insight:
+                      type: string
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get financial insights
+      tags:
+      - analytics
+  /analytics/money-flow:
+    get:
+      consumes:
+      - application/json
+      description: Get income and expense flow data over specified period
+      parameters:
+      - default: 6months
+        description: Time period
+        enum:
+        - 7days
+        - 1month
+        - 6months
+        - 1year
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    data:
+                      type: object
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get money flow
+      tags:
+      - analytics
+  /analytics/spending:
+    get:
+      consumes:
+      - application/json
+      description: Get spending breakdown by category for specified period
+      parameters:
+      - default: 1month
+        description: Time period
+        enum:
+        - 7days
+        - 1month
+        - 3months
+        - 6months
+        - 1year
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    by_category:
+                      items:
+                        type: object
+                      type: array
+                    total_spending:
+                      type: number
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get spending analysis
+      tags:
+      - analytics
+  /analytics/trends:
+    get:
+      consumes:
+      - application/json
+      description: Get monthly financial trend data
+      parameters:
+      - default: 6
+        description: Number of months
+        in: query
+        maximum: 24
+        minimum: 1
+        name: months
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    trends:
+                      items:
+                        type: object
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get financial trends
+      tags:
+      - analytics
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    token:
+                      type: string
+                    user:
+                      $ref: '#/definitions/models.User'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Login user
+      tags:
+      - auth
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Get the authenticated user's profile information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    user:
+                      $ref: '#/definitions/models.User'
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - auth
+  /auth/onboarding:
+    post:
+      consumes:
+      - application/json
+      description: Mark the user's onboarding process as complete
+      parameters:
+      - description: Onboarding data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.OnboardingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    message:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Complete user onboarding
+      tags:
+      - auth
+  /auth/profile:
+    put:
+      consumes:
+      - application/json
+      description: Update the authenticated user's profile information
+      parameters:
+      - description: Profile update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    user:
+                      $ref: '#/definitions/models.User'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Update user profile
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with name, email, and password
+      parameters:
+      - description: Registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    token:
+                      type: string
+                    user:
+                      $ref: '#/definitions/models.User'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Register a new user
+      tags:
+      - auth
+  /budgets:
+    get:
+      consumes:
+      - application/json
+      description: Get all budgets for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    budgets:
+                      items:
+                        $ref: '#/definitions/models.Budget'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: List budgets
+      tags:
+      - budgets
+    post:
+      consumes:
+      - application/json
+      description: Create a new budget with spending limit
+      parameters:
+      - description: Budget data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateBudgetRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    budget:
+                      $ref: '#/definitions/models.Budget'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Create budget
+      tags:
+      - budgets
+  /budgets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a budget
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete budget
+      tags:
+      - budgets
+    get:
+      consumes:
+      - application/json
+      description: Get a single budget by ID
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    budget:
+                      $ref: '#/definitions/models.Budget'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get budget
+      tags:
+      - budgets
+    put:
+      consumes:
+      - application/json
+      description: Update an existing budget
+      parameters:
+      - description: Budget ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Budget update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateBudgetRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    budget:
+                      $ref: '#/definitions/models.Budget'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Update budget
+      tags:
+      - budgets
+  /budgets/summary:
+    get:
+      consumes:
+      - application/json
+      description: Get overall budget summary and spending for the current month
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    summary:
+                      type: object
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get budget summary
+      tags:
+      - budgets
+  /goals:
+    get:
+      consumes:
+      - application/json
+      description: Get all savings goals for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    goals:
+                      items:
+                        $ref: '#/definitions/models.SavingGoal'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: List savings goals
+      tags:
+      - goals
+    post:
+      consumes:
+      - application/json
+      description: Create a new savings goal
+      parameters:
+      - description: Goal data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateGoalRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    goal:
+                      $ref: '#/definitions/models.SavingGoal'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Create savings goal
+      tags:
+      - goals
+  /goals/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a savings goal
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete savings goal
+      tags:
+      - goals
+    get:
+      consumes:
+      - application/json
+      description: Get a single savings goal by ID
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    goal:
+                      $ref: '#/definitions/models.SavingGoal'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get savings goal
+      tags:
+      - goals
+    put:
+      consumes:
+      - application/json
+      description: Update an existing savings goal
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Goal update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateGoalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    goal:
+                      $ref: '#/definitions/models.SavingGoal'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Update savings goal
+      tags:
+      - goals
+  /goals/{id}/progress:
+    patch:
+      consumes:
+      - application/json
+      description: Add funds to a savings goal's current amount
+      parameters:
+      - description: Goal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Progress amount
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateProgressRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    goal:
+                      $ref: '#/definitions/models.SavingGoal'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Update goal progress
+      tags:
+      - goals
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get paginated list of user's transactions
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    data:
+                      items:
+                        $ref: '#/definitions/models.Transaction'
+                      type: array
+                    pagination:
+                      type: object
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: List transactions
+      tags:
+      - transactions
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction
+      parameters:
+      - description: Transaction data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    transaction:
+                      $ref: '#/definitions/models.Transaction'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Create transaction
+      tags:
+      - transactions
+  /transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a transaction
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete transaction
+      tags:
+      - transactions
+    get:
+      consumes:
+      - application/json
+      description: Get a single transaction by ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    transaction:
+                      $ref: '#/definitions/models.Transaction'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get transaction
+      tags:
+      - transactions
+    put:
+      consumes:
+      - application/json
+      description: Update an existing transaction
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Transaction update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    transaction:
+                      $ref: '#/definitions/models.Transaction'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Update transaction
+      tags:
+      - transactions
+  /transactions/stats:
+    get:
+      consumes:
+      - application/json
+      description: Get transaction statistics for the current month
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    stats:
+                      type: object
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get transaction statistics
+      tags:
+      - transactions
+  /wallets:
+    get:
+      consumes:
+      - application/json
+      description: Get all wallet accounts for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    wallets:
+                      items:
+                        $ref: '#/definitions/models.Wallet'
+                      type: array
+                  type: object
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: List wallets
+      tags:
+      - wallets
+    post:
+      consumes:
+      - application/json
+      description: Create a new wallet account
+      parameters:
+      - description: Wallet data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    wallet:
+                      $ref: '#/definitions/models.Wallet'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Create wallet
+      tags:
+      - wallets
+  /wallets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a wallet account
+      parameters:
+      - description: Wallet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete wallet
+      tags:
+      - wallets
+    get:
+      consumes:
+      - application/json
+      description: Get a single wallet by ID
+      parameters:
+      - description: Wallet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    wallet:
+                      $ref: '#/definitions/models.Wallet'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Get wallet
+      tags:
+      - wallets
+    put:
+      consumes:
+      - application/json
+      description: Update a wallet account (can set as default)
+      parameters:
+      - description: Wallet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Wallet update data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateWalletRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  properties:
+                    wallet:
+                      $ref: '#/definitions/models.Wallet'
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - BearerAuth: []
+      summary: Update wallet
+      tags:
+      - wallets
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
