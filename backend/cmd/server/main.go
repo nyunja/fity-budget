@@ -12,7 +12,30 @@ import (
 	"github.com/nyunja/fity-budget-backend/internal/repository"
 	"github.com/nyunja/fity-budget-backend/internal/services"
 	"gorm.io/gorm"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/nyunja/fity-budget-backend/docs" // Swagger docs
 )
+
+// @title FityBudget API
+// @version 1.0
+// @description Personal Finance Management API - Track expenses, manage budgets, and achieve savings goals
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@fitybudget.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
 	// Load configuration
@@ -84,12 +107,17 @@ func main() {
 	)
 	log.Println("Routes configured")
 
+	// Setup Swagger documentation
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	log.Println("Swagger documentation enabled at /swagger/index.html")
+
 	// Start server
 	addr := ":" + cfg.Server.Port
 	log.Printf("🚀 FityBudget API server starting on port %s", cfg.Server.Port)
 	log.Printf("📊 Environment: %s", cfg.Server.Env)
 	log.Printf("🔗 API URL: http://localhost:%s/api/v1", cfg.Server.Port)
 	log.Printf("💚 Health Check: http://localhost:%s/health", cfg.Server.Port)
+	log.Printf("📚 API Docs: http://localhost:%s/swagger/index.html", cfg.Server.Port)
 
 	if err := router.Run(addr); err != nil {
 		log.Fatal("Failed to start server:", err)

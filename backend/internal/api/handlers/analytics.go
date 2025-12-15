@@ -19,8 +19,17 @@ func NewAnalyticsHandler(analyticsService services.AnalyticsService) *AnalyticsH
 	return &AnalyticsHandler{analyticsService: analyticsService}
 }
 
-// GetDashboardStats gets financial statistics for the dashboard
-// GET /api/v1/analytics/dashboard
+// GetDashboardStats godoc
+// @Summary Get dashboard statistics
+// @Description Get comprehensive financial statistics for the dashboard
+// @Tags analytics
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{dashboard=object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /analytics/dashboard [get]
 func (h *AnalyticsHandler) GetDashboardStats(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -39,8 +48,18 @@ func (h *AnalyticsHandler) GetDashboardStats(c *gin.Context) {
 	})
 }
 
-// GetMoneyFlow gets income and expense flow over time
-// GET /api/v1/analytics/money-flow
+// GetMoneyFlow godoc
+// @Summary Get money flow
+// @Description Get income and expense flow data over specified period
+// @Tags analytics
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param period query string false "Time period" Enums(7days, 1month, 6months, 1year) default(6months)
+// @Success 200 {object} utils.Response{data=object{data=object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /analytics/money-flow [get]
 func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -88,8 +107,18 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 	})
 }
 
-// GetSpendingAnalysis gets spending breakdown by category
-// GET /api/v1/analytics/spending
+// GetSpendingAnalysis godoc
+// @Summary Get spending analysis
+// @Description Get spending breakdown by category for specified period
+// @Tags analytics
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param period query string false "Time period" Enums(7days, 1month, 3months, 6months, 1year) default(1month)
+// @Success 200 {object} utils.Response{data=object{total_spending=number,by_category=[]object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /analytics/spending [get]
 func (h *AnalyticsHandler) GetSpendingAnalysis(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -137,8 +166,17 @@ func (h *AnalyticsHandler) GetSpendingAnalysis(c *gin.Context) {
 	})
 }
 
-// GetInsights gets AI-generated financial insights
-// GET /api/v1/analytics/insights
+// GetInsights godoc
+// @Summary Get financial insights
+// @Description Get AI-generated financial insights and recommendations
+// @Tags analytics
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{insight=string,generated_at=string,health_score=object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /analytics/insights [get]
 func (h *AnalyticsHandler) GetInsights(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -177,8 +215,18 @@ func (h *AnalyticsHandler) GetInsights(c *gin.Context) {
 	})
 }
 
-// GetTrends gets monthly trend data
-// GET /api/v1/analytics/trends
+// GetTrends godoc
+// @Summary Get financial trends
+// @Description Get monthly financial trend data
+// @Tags analytics
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param months query int false "Number of months" default(6) minimum(1) maximum(24)
+// @Success 200 {object} utils.Response{data=object{trends=[]object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /analytics/trends [get]
 func (h *AnalyticsHandler) GetTrends(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -207,8 +255,17 @@ func (h *AnalyticsHandler) GetTrends(c *gin.Context) {
 	})
 }
 
-// GetFinancialHealth gets overall financial health score
-// GET /api/v1/analytics/health
+// GetFinancialHealth godoc
+// @Summary Get financial health score
+// @Description Get overall financial health score with detailed metrics
+// @Tags analytics
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{health_score=object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /analytics/health [get]
 func (h *AnalyticsHandler) GetFinancialHealth(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {

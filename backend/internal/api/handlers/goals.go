@@ -48,8 +48,17 @@ type UpdateProgressRequest struct {
 	Amount float64 `json:"amount" binding:"required,gt=0"`
 }
 
-// ListGoals gets all savings goals for the authenticated user
-// GET /api/v1/goals
+// ListGoals godoc
+// @Summary List savings goals
+// @Description Get all savings goals for the authenticated user
+// @Tags goals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{goals=[]models.SavingGoal}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /goals [get]
 func (h *GoalHandler) ListGoals(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -68,8 +77,19 @@ func (h *GoalHandler) ListGoals(c *gin.Context) {
 	})
 }
 
-// GetGoal gets a single goal by ID
-// GET /api/v1/goals/:id
+// GetGoal godoc
+// @Summary Get savings goal
+// @Description Get a single savings goal by ID
+// @Tags goals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Goal ID"
+// @Success 200 {object} utils.Response{data=object{goal=models.SavingGoal}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Failure 404 {object} utils.Response
+// @Router /goals/{id} [get]
 func (h *GoalHandler) GetGoal(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -95,8 +115,18 @@ func (h *GoalHandler) GetGoal(c *gin.Context) {
 	})
 }
 
-// CreateGoal creates a new savings goal
-// POST /api/v1/goals
+// CreateGoal godoc
+// @Summary Create savings goal
+// @Description Create a new savings goal
+// @Tags goals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreateGoalRequest true "Goal data"
+// @Success 201 {object} utils.Response{data=object{goal=models.SavingGoal}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /goals [post]
 func (h *GoalHandler) CreateGoal(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -134,8 +164,19 @@ func (h *GoalHandler) CreateGoal(c *gin.Context) {
 	})
 }
 
-// UpdateGoal updates a savings goal
-// PUT /api/v1/goals/:id
+// UpdateGoal godoc
+// @Summary Update savings goal
+// @Description Update an existing savings goal
+// @Tags goals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Goal ID"
+// @Param request body UpdateGoalRequest true "Goal update data"
+// @Success 200 {object} utils.Response{data=object{goal=models.SavingGoal}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /goals/{id} [put]
 func (h *GoalHandler) UpdateGoal(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -180,8 +221,19 @@ func (h *GoalHandler) UpdateGoal(c *gin.Context) {
 	})
 }
 
-// UpdateProgress adds funds to a savings goal
-// PATCH /api/v1/goals/:id/progress
+// UpdateProgress godoc
+// @Summary Update goal progress
+// @Description Add funds to a savings goal's current amount
+// @Tags goals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Goal ID"
+// @Param request body UpdateProgressRequest true "Progress amount"
+// @Success 200 {object} utils.Response{data=object{goal=models.SavingGoal}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /goals/{id}/progress [patch]
 func (h *GoalHandler) UpdateProgress(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -213,8 +265,18 @@ func (h *GoalHandler) UpdateProgress(c *gin.Context) {
 	})
 }
 
-// DeleteGoal deletes a savings goal
-// DELETE /api/v1/goals/:id
+// DeleteGoal godoc
+// @Summary Delete savings goal
+// @Description Delete a savings goal
+// @Tags goals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Goal ID"
+// @Success 204 "No Content"
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /goals/{id} [delete]
 func (h *GoalHandler) DeleteGoal(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {

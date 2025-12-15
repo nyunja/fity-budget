@@ -39,8 +39,17 @@ type UpdateWalletRequest struct {
 	IsDefault     *bool   `json:"is_default"`
 }
 
-// ListWallets gets all wallet accounts for the authenticated user
-// GET /api/v1/wallets
+// ListWallets godoc
+// @Summary List wallets
+// @Description Get all wallet accounts for the authenticated user
+// @Tags wallets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{wallets=[]models.Wallet}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /wallets [get]
 func (h *WalletHandler) ListWallets(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -59,8 +68,19 @@ func (h *WalletHandler) ListWallets(c *gin.Context) {
 	})
 }
 
-// GetWallet gets a single wallet by ID
-// GET /api/v1/wallets/:id
+// GetWallet godoc
+// @Summary Get wallet
+// @Description Get a single wallet by ID
+// @Tags wallets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Wallet ID"
+// @Success 200 {object} utils.Response{data=object{wallet=models.Wallet}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Failure 404 {object} utils.Response
+// @Router /wallets/{id} [get]
 func (h *WalletHandler) GetWallet(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -86,8 +106,18 @@ func (h *WalletHandler) GetWallet(c *gin.Context) {
 	})
 }
 
-// CreateWallet creates a new wallet account
-// POST /api/v1/wallets
+// CreateWallet godoc
+// @Summary Create wallet
+// @Description Create a new wallet account
+// @Tags wallets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreateWalletRequest true "Wallet data"
+// @Success 201 {object} utils.Response{data=object{wallet=models.Wallet}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /wallets [post]
 func (h *WalletHandler) CreateWallet(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -123,8 +153,19 @@ func (h *WalletHandler) CreateWallet(c *gin.Context) {
 	})
 }
 
-// UpdateWallet updates a wallet account
-// PUT /api/v1/wallets/:id
+// UpdateWallet godoc
+// @Summary Update wallet
+// @Description Update a wallet account (can set as default)
+// @Tags wallets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Wallet ID"
+// @Param request body UpdateWalletRequest true "Wallet update data"
+// @Success 200 {object} utils.Response{data=object{wallet=models.Wallet}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /wallets/{id} [put]
 func (h *WalletHandler) UpdateWallet(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -175,8 +216,18 @@ func (h *WalletHandler) UpdateWallet(c *gin.Context) {
 	})
 }
 
-// DeleteWallet deletes a wallet account
-// DELETE /api/v1/wallets/:id
+// DeleteWallet godoc
+// @Summary Delete wallet
+// @Description Delete a wallet account
+// @Tags wallets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Wallet ID"
+// @Success 204 "No Content"
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /wallets/{id} [delete]
 func (h *WalletHandler) DeleteWallet(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {

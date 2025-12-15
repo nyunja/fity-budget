@@ -39,8 +39,17 @@ type UpdateBudgetRequest struct {
 	AlertThreshold *int    `json:"alert_threshold" binding:"omitempty,gte=0,lte=100"`
 }
 
-// ListBudgets gets all budgets for the authenticated user
-// GET /api/v1/budgets
+// ListBudgets godoc
+// @Summary List budgets
+// @Description Get all budgets for the authenticated user
+// @Tags budgets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{budgets=[]models.Budget}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /budgets [get]
 func (h *BudgetHandler) ListBudgets(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -59,8 +68,19 @@ func (h *BudgetHandler) ListBudgets(c *gin.Context) {
 	})
 }
 
-// GetBudget gets a single budget by ID
-// GET /api/v1/budgets/:id
+// GetBudget godoc
+// @Summary Get budget
+// @Description Get a single budget by ID
+// @Tags budgets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Budget ID"
+// @Success 200 {object} utils.Response{data=object{budget=models.Budget}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Failure 404 {object} utils.Response
+// @Router /budgets/{id} [get]
 func (h *BudgetHandler) GetBudget(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -86,8 +106,18 @@ func (h *BudgetHandler) GetBudget(c *gin.Context) {
 	})
 }
 
-// CreateBudget creates a new budget
-// POST /api/v1/budgets
+// CreateBudget godoc
+// @Summary Create budget
+// @Description Create a new budget with spending limit
+// @Tags budgets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreateBudgetRequest true "Budget data"
+// @Success 201 {object} utils.Response{data=object{budget=models.Budget}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /budgets [post]
 func (h *BudgetHandler) CreateBudget(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -123,8 +153,19 @@ func (h *BudgetHandler) CreateBudget(c *gin.Context) {
 	})
 }
 
-// UpdateBudget updates a budget
-// PUT /api/v1/budgets/:id
+// UpdateBudget godoc
+// @Summary Update budget
+// @Description Update an existing budget
+// @Tags budgets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Budget ID"
+// @Param request body UpdateBudgetRequest true "Budget update data"
+// @Success 200 {object} utils.Response{data=object{budget=models.Budget}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /budgets/{id} [put]
 func (h *BudgetHandler) UpdateBudget(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -167,8 +208,18 @@ func (h *BudgetHandler) UpdateBudget(c *gin.Context) {
 	})
 }
 
-// DeleteBudget deletes a budget
-// DELETE /api/v1/budgets/:id
+// DeleteBudget godoc
+// @Summary Delete budget
+// @Description Delete a budget
+// @Tags budgets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Budget ID"
+// @Success 204 "No Content"
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /budgets/{id} [delete]
 func (h *BudgetHandler) DeleteBudget(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -191,8 +242,17 @@ func (h *BudgetHandler) DeleteBudget(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// GetBudgetSummary gets overall budget summary for the current month
-// GET /api/v1/budgets/summary
+// GetBudgetSummary godoc
+// @Summary Get budget summary
+// @Description Get overall budget summary and spending for the current month
+// @Tags budgets
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{summary=object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /budgets/summary [get]
 func (h *BudgetHandler) GetBudgetSummary(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {

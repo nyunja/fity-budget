@@ -44,8 +44,19 @@ type UpdateTransactionRequest struct {
 	TransactionDate *time.Time `json:"transaction_date"`
 }
 
-// ListTransactions gets paginated list of user's transactions
-// GET /api/v1/transactions
+// ListTransactions godoc
+// @Summary List transactions
+// @Description Get paginated list of user's transactions
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Items per page" default(20)
+// @Success 200 {object} utils.Response{data=object{data=[]models.Transaction,pagination=object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /transactions [get]
 func (h *TransactionHandler) ListTransactions(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -90,8 +101,19 @@ func (h *TransactionHandler) ListTransactions(c *gin.Context) {
 	})
 }
 
-// GetTransaction gets a single transaction by ID
-// GET /api/v1/transactions/:id
+// GetTransaction godoc
+// @Summary Get transaction
+// @Description Get a single transaction by ID
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Transaction ID"
+// @Success 200 {object} utils.Response{data=object{transaction=models.Transaction}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Failure 404 {object} utils.Response
+// @Router /transactions/{id} [get]
 func (h *TransactionHandler) GetTransaction(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -117,8 +139,18 @@ func (h *TransactionHandler) GetTransaction(c *gin.Context) {
 	})
 }
 
-// CreateTransaction creates a new transaction
-// POST /api/v1/transactions
+// CreateTransaction godoc
+// @Summary Create transaction
+// @Description Create a new transaction
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreateTransactionRequest true "Transaction data"
+// @Success 201 {object} utils.Response{data=object{transaction=models.Transaction}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /transactions [post]
 func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -163,8 +195,19 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	})
 }
 
-// UpdateTransaction updates an existing transaction
-// PUT /api/v1/transactions/:id
+// UpdateTransaction godoc
+// @Summary Update transaction
+// @Description Update an existing transaction
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Transaction ID"
+// @Param request body UpdateTransactionRequest true "Transaction update data"
+// @Success 200 {object} utils.Response{data=object{transaction=models.Transaction}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /transactions/{id} [put]
 func (h *TransactionHandler) UpdateTransaction(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -213,8 +256,18 @@ func (h *TransactionHandler) UpdateTransaction(c *gin.Context) {
 	})
 }
 
-// DeleteTransaction deletes a transaction
-// DELETE /api/v1/transactions/:id
+// DeleteTransaction godoc
+// @Summary Delete transaction
+// @Description Delete a transaction
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Transaction ID"
+// @Success 204 "No Content"
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /transactions/{id} [delete]
 func (h *TransactionHandler) DeleteTransaction(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -237,8 +290,17 @@ func (h *TransactionHandler) DeleteTransaction(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// GetTransactionStats gets transaction statistics for current month
-// GET /api/v1/transactions/stats
+// GetTransactionStats godoc
+// @Summary Get transaction statistics
+// @Description Get transaction statistics for the current month
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{stats=object}}
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /transactions/stats [get]
 func (h *TransactionHandler) GetTransactionStats(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {

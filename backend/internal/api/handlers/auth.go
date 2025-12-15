@@ -40,8 +40,16 @@ type OnboardingRequest struct {
 	FinancialGoals []string `json:"financial_goals"`
 }
 
-// Register creates a new user account
-// POST /api/v1/auth/register
+// Register godoc
+// @Summary Register a new user
+// @Description Create a new user account with name, email, and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RegisterRequest true "Registration details"
+// @Success 201 {object} utils.Response{data=object{user=models.User,token=string}}
+// @Failure 400 {object} utils.Response
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -61,8 +69,17 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	})
 }
 
-// Login authenticates a user and returns a JWT token
-// POST /api/v1/auth/login
+// Login godoc
+// @Summary Login user
+// @Description Authenticate user and return JWT token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Login credentials"
+// @Success 200 {object} utils.Response{data=object{user=models.User,token=string}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -82,8 +99,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
-// GetMe returns the current authenticated user's profile
-// GET /api/v1/auth/me
+// GetMe godoc
+// @Summary Get current user profile
+// @Description Get the authenticated user's profile information
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} utils.Response{data=object{user=models.User}}
+// @Failure 401 {object} utils.Response
+// @Failure 404 {object} utils.Response
+// @Router /auth/me [get]
 func (h *AuthHandler) GetMe(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -102,8 +128,18 @@ func (h *AuthHandler) GetMe(c *gin.Context) {
 	})
 }
 
-// UpdateProfile updates the current user's profile
-// PUT /api/v1/auth/profile
+// UpdateProfile godoc
+// @Summary Update user profile
+// @Description Update the authenticated user's profile information
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body UpdateProfileRequest true "Profile update data"
+// @Success 200 {object} utils.Response{data=object{user=models.User}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /auth/profile [put]
 func (h *AuthHandler) UpdateProfile(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
@@ -128,8 +164,18 @@ func (h *AuthHandler) UpdateProfile(c *gin.Context) {
 	})
 }
 
-// CompleteOnboarding marks the user's onboarding as complete
-// POST /api/v1/auth/onboarding
+// CompleteOnboarding godoc
+// @Summary Complete user onboarding
+// @Description Mark the user's onboarding process as complete
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body OnboardingRequest true "Onboarding data"
+// @Success 200 {object} utils.Response{data=object{message=string}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /auth/onboarding [post]
 func (h *AuthHandler) CompleteOnboarding(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
