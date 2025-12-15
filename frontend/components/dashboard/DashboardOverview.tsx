@@ -1,6 +1,6 @@
 import React from 'react';
 import TransactionList from '../TransactionList';
-import SavingGoals from '../SavingGoals';
+import { SavingGoals } from '../../features/goals';
 import { Transaction, SavingGoal } from '../../types';
 
 interface DashboardOverviewProps {
