@@ -7,13 +7,12 @@ interface TransactionListProps {
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({ data }) => {
-  const getIcon = (name: string) => {
-    switch (name) {
-      case 'YouTube': return <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center"><Youtube size={16} fill="currentColor" /></div>;
-      case 'Yaposhka': return <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 flex items-center justify-center"><Coffee size={16} /></div>;
-      case 'Salary': 
-      case 'Initial Deposit':
-        return <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center"><DollarSign size={16} /></div>;
+  const getIcon = (name: string, category?: string) => {
+    switch (category?.toLowerCase()) {
+      case 'subscription': return <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center"><Youtube size={16} /></div>;
+      case 'food & groceries':
+      case 'cafe & restaurants': return <div className="w-8 h-8 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 flex items-center justify-center"><Coffee size={16} /></div>;
+      case 'income': return <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center"><DollarSign size={16} /></div>;
       default: return <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center"><ShoppingBag size={16} /></div>;
     }
   };
@@ -53,7 +52,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ data }) => {
                 </td>
                 <td className="py-4 text-sm text-gray-900 dark:text-white">
                   <div className="flex items-center gap-3">
-                    {getIcon(tx.name)}
+                    {getIcon(tx.name, tx.category)}
                     <span className="font-medium">{tx.name}</span>
                   </div>
                 </td>

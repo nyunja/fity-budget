@@ -12,7 +12,7 @@ import { AnalyticsPage } from './features/analytics';
 import { SettingsPage } from './features/settings';
 import WalletPage from './components/WalletPage';
 import { HelpPage } from './features/help';
-import { STATS, SAVING_GOALS, MONEY_FLOW_DATA, BUDGET_DATA, USER_NAME, ALL_TRANSACTIONS, INITIAL_BUDGETS, INITIAL_WALLETS } from './constants';
+
 import { getFinancialInsights } from './services/geminiService';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { User, StatMetric, Transaction, SavingGoal, MoneyFlowData, BudgetCategory, ViewState, Budget, WalletAccount } from './types';
