@@ -2,6 +2,7 @@ import { useAPI } from '../useAPI';
 import { analyticsAPI } from '../../services/api';
 import { StatMetric } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePeriod } from '../../contexts/PeriodContext';
 
 interface DashboardSummary {
   total_balance: number;
@@ -16,10 +17,11 @@ interface DashboardSummary {
 
 export const useDashboardStats = () => {
   const { isAuthenticated } = useAuth();
+  const { startDate, endDate } = usePeriod();
 
   const { data: dashboardData, loading, error } = useAPI<{ dashboard: DashboardSummary }>(
-    () => analyticsAPI.getDashboard(),
-    { auto: isAuthenticated }
+    () => analyticsAPI.getDashboard({ start_date: startDate, end_date: endDate }),
+    { auto: isAuthenticated, deps: [isAuthenticated, startDate, endDate] }
   );
 
   // Transform backend dashboard data into StatMetric array

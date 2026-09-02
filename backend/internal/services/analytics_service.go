@@ -10,9 +10,9 @@ import (
 
 // AnalyticsService defines the interface for analytics and reporting operations
 type AnalyticsService interface {
-	GetDashboardSummary(userID uuid.UUID) (*DashboardSummary, error)
+	GetDashboardSummary(userID uuid.UUID, startDate, endDate time.Time) (*DashboardSummary, error)
 	GetSpendingByCategory(userID uuid.UUID, startDate, endDate time.Time) ([]*CategorySpending, error)
-	GetIncomeVsExpense(userID uuid.UUID, period string) (*IncomeVsExpenseReport, error)
+	GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time) (*IncomeVsExpenseReport, error)
 	GetMonthlyTrends(userID uuid.UUID, months int) (*MonthlyTrends, error)
 	GetFinancialHealthScore(userID uuid.UUID) (*FinancialHealthScore, error)
 }
@@ -111,8 +111,8 @@ func NewAnalyticsService(
 	}
 }
 
-// GetDashboardSummary retrieves the main dashboard summary
-func (s *analyticsService) GetDashboardSummary(userID uuid.UUID) (*DashboardSummary, error) {
+// GetDashboardSummary retrieves the main dashboard summary for the given date range
+func (s *analyticsService) GetDashboardSummary(userID uuid.UUID, startDate, endDate time.Time) (*DashboardSummary, error) {
 	summary := &DashboardSummary{}
 
 	// Get total balance from all wallets
@@ -124,10 +124,14 @@ func (s *analyticsService) GetDashboardSummary(userID uuid.UUID) (*DashboardSumm
 		summary.TotalBalance += wallet.Balance
 	}
 
-	// Get current month's transactions
+	// Default to the current month when no range is provided
 	now := time.Now()
-	startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
-	endOfMonth := startOfMonth.AddDate(0, 1, 0)
+	if startDate.IsZero() {
+		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	}
+	if endDate.IsZero() {
+		endDate = startDate.AddDate(0, 1, 0)
+	}
 
 	transactions, err := s.transactionRepo.FindByUserID(userID, 10000, 0)
 	if err != nil {
@@ -138,20 +142,23 @@ func (s *analyticsService) GetDashboardSummary(userID uuid.UUID) (*DashboardSumm
 
 	for _, txn := range transactions {
 		if txn.Status == "Completed" {
-			// Current month stats
-			if txn.TransactionDate.After(startOfMonth) && txn.TransactionDate.Before(endOfMonth) {
-				// Note: Transaction model doesn't have Type field to distinguish income/expense
-				// All transactions are counted as expenses for now
-				summary.TotalExpense += txn.Amount
+			// Selected period stats
+			if (txn.TransactionDate.After(startDate) || txn.TransactionDate.Equal(startDate)) &&
+				(txn.TransactionDate.Before(endDate) || txn.TransactionDate.Equal(endDate)) {
+				if txn.Type == "income" {
+					summary.TotalIncome += txn.Amount
+				} else {
+					summary.TotalExpense += txn.Amount
 
-				// Track category spending
-				if _, exists := categoryMap[txn.Category]; !exists {
-					categoryMap[txn.Category] = &CategorySpending{
-						Category: txn.Category,
+					// Track category spending (expenses only)
+					if _, exists := categoryMap[txn.Category]; !exists {
+						categoryMap[txn.Category] = &CategorySpending{
+							Category: txn.Category,
+						}
 					}
+					categoryMap[txn.Category].Amount += txn.Amount
+					categoryMap[txn.Category].Count++
 				}
-				categoryMap[txn.Category].Amount += txn.Amount
-				categoryMap[txn.Category].Count++
 				summary.RecentTransactions++
 			}
 		}
@@ -204,8 +211,8 @@ func (s *analyticsService) GetDashboardSummary(userID uuid.UUID) (*DashboardSumm
 		}
 	}
 
-	// Get month comparison
-	summary.MonthComparison = s.getMonthComparison(userID, transactions, startOfMonth)
+	// Get period comparison (selected period vs previous period of the same length)
+	summary.MonthComparison = s.getPeriodComparison(userID, transactions, startDate, endDate)
 
 	return summary, nil
 }
@@ -258,10 +265,18 @@ func (s *analyticsService) GetSpendingByCategory(userID uuid.UUID, startDate, en
 	return categories, nil
 }
 
-// GetIncomeVsExpense retrieves income vs expense report for a period
-func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, period string) (*IncomeVsExpenseReport, error) {
+// GetIncomeVsExpense retrieves income vs expense report for the given date range
+func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time) (*IncomeVsExpenseReport, error) {
+	now := time.Now()
+	if startDate.IsZero() {
+		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	}
+	if endDate.IsZero() {
+		endDate = startDate.AddDate(0, 1, 0)
+	}
+
 	report := &IncomeVsExpenseReport{
-		Period: period,
+		Period: startDate.Format("2006-01-02") + " to " + endDate.Format("2006-01-02"),
 	}
 
 	transactions, err := s.transactionRepo.FindByUserID(userID, 10000, 0)
@@ -269,24 +284,12 @@ func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, period string) (
 		return nil, err
 	}
 
-	now := time.Now()
-	var startDate time.Time
-
-	switch period {
-	case "week":
-		startDate = now.AddDate(0, 0, -7)
-	case "month":
-		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
-	case "year":
-		startDate = time.Date(now.Year(), 1, 1, 0, 0, 0, 0, now.Location())
-	default:
-		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
-	}
-
 	dailyMap := make(map[string]*IncomeExpenseData)
 
 	for _, txn := range transactions {
-		if txn.Status == "Completed" && txn.TransactionDate.After(startDate) {
+		if txn.Status == "Completed" &&
+			(txn.TransactionDate.After(startDate) || txn.TransactionDate.Equal(startDate)) &&
+			(txn.TransactionDate.Before(endDate) || txn.TransactionDate.Equal(endDate)) {
 			dateKey := txn.TransactionDate.Format("2006-01-02")
 
 			if _, exists := dailyMap[dateKey]; !exists {
@@ -295,10 +298,13 @@ func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, period string) (
 				}
 			}
 
-			// Note: Transaction model doesn't have Type field
-			// All transactions counted as expenses
-			report.TotalExpense += txn.Amount
-			dailyMap[dateKey].Expense += txn.Amount
+			if txn.Type == "income" {
+				report.TotalIncome += txn.Amount
+				dailyMap[dateKey].Income += txn.Amount
+			} else {
+				report.TotalExpense += txn.Amount
+				dailyMap[dateKey].Expense += txn.Amount
+			}
 		}
 	}
 
@@ -357,9 +363,11 @@ func (s *analyticsService) GetMonthlyTrends(userID uuid.UUID, months int) (*Mont
 		if txn.Status == "Completed" {
 			monthKey := txn.TransactionDate.Format("2006-01")
 			if data, exists := monthlyMap[monthKey]; exists {
-				// Note: Transaction model doesn't have Type field
-				// All transactions counted as expenses
-				data.expense += txn.Amount
+				if txn.Type == "income" {
+					data.income += txn.Amount
+				} else {
+					data.expense += txn.Amount
+				}
 			}
 		}
 	}
@@ -427,9 +435,11 @@ func (s *analyticsService) GetFinancialHealthScore(userID uuid.UUID) (*Financial
 
 	for _, txn := range transactions {
 		if txn.Status == "Completed" && txn.TransactionDate.After(startOfMonth) {
-			// Note: Transaction model doesn't have Type field
-			// All transactions counted as expenses
-			monthlyExpense += txn.Amount
+			if txn.Type == "income" {
+				monthlyIncome += txn.Amount
+			} else {
+				monthlyExpense += txn.Amount
+			}
 		}
 	}
 
@@ -552,26 +562,32 @@ func (s *analyticsService) GetFinancialHealthScore(userID uuid.UUID) (*Financial
 	return score, nil
 }
 
-// Helper function to get month comparison data
-func (s *analyticsService) getMonthComparison(userID uuid.UUID, transactions []*models.Transaction, startOfMonth time.Time) *MonthComparisonData {
+// Helper function to compare the selected period against the previous period of the same length
+func (s *analyticsService) getPeriodComparison(userID uuid.UUID, transactions []*models.Transaction, startDate, endDate time.Time) *MonthComparisonData {
 	comparison := &MonthComparisonData{}
 
-	endOfMonth := startOfMonth.AddDate(0, 1, 0)
-	startOfPrevMonth := startOfMonth.AddDate(0, -1, 0)
+	periodLength := endDate.Sub(startDate)
+	previousStart := startDate.Add(-periodLength)
 
 	for _, txn := range transactions {
 		if txn.Status == "Completed" {
-			// Current month
-			if txn.TransactionDate.After(startOfMonth) && txn.TransactionDate.Before(endOfMonth) {
-				// Note: Transaction model doesn't have Type field
-				// All transactions counted as expenses
-				comparison.CurrentMonthExpense += txn.Amount
+			// Current period
+			if (txn.TransactionDate.After(startDate) || txn.TransactionDate.Equal(startDate)) &&
+				txn.TransactionDate.Before(endDate) {
+				if txn.Type == "income" {
+					comparison.CurrentMonthIncome += txn.Amount
+				} else {
+					comparison.CurrentMonthExpense += txn.Amount
+				}
 			}
-			// Previous month
-			if txn.TransactionDate.After(startOfPrevMonth) && txn.TransactionDate.Before(startOfMonth) {
-				// Note: Transaction model doesn't have Type field
-				// All transactions counted as expenses
-				comparison.PreviousMonthExpense += txn.Amount
+			// Previous period
+			if (txn.TransactionDate.After(previousStart) || txn.TransactionDate.Equal(previousStart)) &&
+				txn.TransactionDate.Before(startDate) {
+				if txn.Type == "income" {
+					comparison.PreviousMonthIncome += txn.Amount
+				} else {
+					comparison.PreviousMonthExpense += txn.Amount
+				}
 			}
 		}
 	}

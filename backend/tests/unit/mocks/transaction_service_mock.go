@@ -12,7 +12,7 @@ import (
 type MockTransactionService struct {
 	CreateTransactionFunc            func(userID uuid.UUID, req services.CreateTransactionRequest) (*models.Transaction, error)
 	GetUserTransactionsFunc          func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
-	GetUserTransactionsWithCountFunc func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error)
+	GetUserTransactionsWithCountFunc func(userID uuid.UUID, limit, offset int, filter services.TransactionFilter) ([]*models.Transaction, int64, error)
 	GetTransactionByIDFunc           func(id, userID uuid.UUID) (*models.Transaction, error)
 	UpdateTransactionFunc            func(id, userID uuid.UUID, req services.UpdateTransactionRequest) (*models.Transaction, error)
 	DeleteTransactionFunc            func(id, userID uuid.UUID) error
@@ -33,9 +33,9 @@ func (m *MockTransactionService) GetUserTransactions(userID uuid.UUID, limit, of
 	return nil, nil
 }
 
-func (m *MockTransactionService) GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+func (m *MockTransactionService) GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int, filter services.TransactionFilter) ([]*models.Transaction, int64, error) {
 	if m.GetUserTransactionsWithCountFunc != nil {
-		return m.GetUserTransactionsWithCountFunc(userID, limit, offset)
+		return m.GetUserTransactionsWithCountFunc(userID, limit, offset, filter)
 	}
 	return nil, 0, nil
 }

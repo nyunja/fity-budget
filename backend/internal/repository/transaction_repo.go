@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/nyunja/fity-budget-backend/internal/models"
 	"gorm.io/gorm"
@@ -11,7 +13,9 @@ type TransactionRepository interface {
 	Create(transaction *models.Transaction) error
 	FindByID(id uuid.UUID) (*models.Transaction, error)
 	FindByUserID(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
+	FindByUserIDAndDateRange(userID uuid.UUID, limit, offset int, startDate, endDate *time.Time) ([]*models.Transaction, error)
 	CountByUserID(userID uuid.UUID) (int64, error)
+	CountByUserIDAndDateRange(userID uuid.UUID, startDate, endDate *time.Time) (int64, error)
 	FindAll() ([]*models.Transaction, error)
 	Update(transaction *models.Transaction) error
 	Delete(id uuid.UUID) error
@@ -39,8 +43,19 @@ func (r *transactionRepository) FindByID(id uuid.UUID) (*models.Transaction, err
 }
 
 func (r *transactionRepository) FindByUserID(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error) {
+	return r.FindByUserIDAndDateRange(userID, limit, offset, nil, nil)
+}
+
+func (r *transactionRepository) FindByUserIDAndDateRange(userID uuid.UUID, limit, offset int, startDate, endDate *time.Time) ([]*models.Transaction, error) {
 	var transactions []*models.Transaction
-	err := r.db.Where("user_id = ?", userID).
+	query := r.db.Where("user_id = ?", userID)
+	if startDate != nil {
+		query = query.Where("transaction_date >= ?", *startDate)
+	}
+	if endDate != nil {
+		query = query.Where("transaction_date <= ?", *endDate)
+	}
+	err := query.
 		Order("transaction_date DESC").
 		Limit(limit).
 		Offset(offset).
@@ -52,8 +67,19 @@ func (r *transactionRepository) FindByUserID(userID uuid.UUID, limit, offset int
 }
 
 func (r *transactionRepository) CountByUserID(userID uuid.UUID) (int64, error) {
+	return r.CountByUserIDAndDateRange(userID, nil, nil)
+}
+
+func (r *transactionRepository) CountByUserIDAndDateRange(userID uuid.UUID, startDate, endDate *time.Time) (int64, error) {
 	var count int64
-	err := r.db.Model(&models.Transaction{}).Where("user_id = ?", userID).Count(&count).Error
+	query := r.db.Model(&models.Transaction{}).Where("user_id = ?", userID)
+	if startDate != nil {
+		query = query.Where("transaction_date >= ?", *startDate)
+	}
+	if endDate != nil {
+		query = query.Where("transaction_date <= ?", *endDate)
+	}
+	err := query.Count(&count).Error
 	return count, err
 }
 

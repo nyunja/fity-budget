@@ -7,16 +7,30 @@ import MonthlySummary from './MonthlySummary';
 import CategoryGrid from './CategoryGrid';
 import CreateBudgetModal from './CreateBudgetModal';
 import useBudgetAnalysis from '../hooks/useBudgetAnalysis';
+import { usePeriod } from '../../../contexts/PeriodContext';
 
 const BudgetPage: React.FC = () => {
+  const { startDate, endDate } = usePeriod();
+
   const { data: budgetsData, loading: budgetsLoading, error: budgetsError, refetch: refetchBudgets } =
     useAPI<{ budgets: Budget[] }>(() => budgetsAPI.list(), { auto: true });
 
   const { data: transactionsData, loading: txLoading, refetch: refetchTx } =
-    useAPI<{ transactions: Transaction[] }>(() => transactionsAPI.list(), { auto: true });
+    useAPI<{ data: Transaction[] }>(
+      () => transactionsAPI.list({ start_date: startDate, end_date: endDate }),
+      { auto: true, deps: [startDate, endDate] }
+    );
 
   const budgets = budgetsData?.budgets ?? [];
-  const transactions = transactionsData?.transactions ?? [];
+  // Backend returns { data: [...] }; sign amounts from the type field
+  const transactions: Transaction[] = (transactionsData?.data ?? []).map((tx: any) => {
+    const amount = Math.abs(tx.amount || 0);
+    return {
+      ...tx,
+      amount: tx.type === 'income' ? amount : -amount,
+      type: tx.type === 'income' ? 'income' : 'expense',
+    } as Transaction;
+  });
 
   const { mutate: createBudget, loading: creating } = useMutation(budgetsAPI.create);
   const { mutate: deleteBudget, loading: deleting } = useMutation(budgetsAPI.delete);

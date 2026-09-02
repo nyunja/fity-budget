@@ -9,21 +9,31 @@ import WalletDetailModal from './wallet/WalletDetailModal';
 import AddWalletModal from './wallet/AddWalletModal';
 import TransferModal from './wallet/TransferModal';
 import { getWalletIcon } from './wallet/walletUtils';
+import { usePeriod } from '../contexts/PeriodContext';
 
 const WalletPage: React.FC = () => {
+   const { startDate, endDate } = usePeriod();
+
    // Fetch data
    const { data: walletsData, loading: walletsLoading, error: walletsError, refetch: refetchWallets } = useAPI<{ wallets: WalletAccount[] }>(
       () => walletsAPI.list(),
       { auto: true }
    );
 
-   const { data: transactionsData, loading: txLoading } = useAPI<{ transactions: Transaction[] }>(
-      () => transactionsAPI.list(),
-      { auto: true }
+   const { data: transactionsData, loading: txLoading } = useAPI<{ data: Transaction[] }>(
+      () => transactionsAPI.list({ start_date: startDate, end_date: endDate }),
+      { auto: true, deps: [startDate, endDate] }
    );
 
    const wallets = walletsData?.wallets || [];
-   const transactions = transactionsData?.transactions || [];
+   const transactions: Transaction[] = (transactionsData?.data || []).map((tx: any) => {
+      const amount = Math.abs(tx.amount || 0);
+      return {
+         ...tx,
+         amount: tx.type === 'income' ? amount : -amount,
+         type: tx.type === 'income' ? 'income' : 'expense',
+      } as Transaction;
+   });
 
    // Mutations
    const { mutate: createWallet, loading: creating } = useMutation(walletsAPI.create);

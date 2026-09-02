@@ -9,11 +9,17 @@ import (
 	"github.com/nyunja/fity-budget-backend/internal/repository"
 )
 
+// TransactionFilter holds optional date-range filters for listing transactions
+type TransactionFilter struct {
+	StartDate *time.Time
+	EndDate   *time.Time
+}
+
 // TransactionService defines the interface for transaction operations
 type TransactionService interface {
 	CreateTransaction(userID uuid.UUID, req CreateTransactionRequest) (*models.Transaction, error)
 	GetUserTransactions(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
-	GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error)
+	GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int, filter TransactionFilter) ([]*models.Transaction, int64, error)
 	GetTransactionByID(id, userID uuid.UUID) (*models.Transaction, error)
 	UpdateTransaction(id, userID uuid.UUID, req UpdateTransactionRequest) (*models.Transaction, error)
 	DeleteTransaction(id, userID uuid.UUID) error
@@ -29,6 +35,7 @@ type transactionService struct {
 type CreateTransactionRequest struct {
 	WalletID        *uuid.UUID `json:"wallet_id"`
 	Amount          float64    `json:"amount" binding:"required,gt=0"`
+	Type            string     `json:"type" binding:"omitempty,oneof=income expense"`
 	Name            string     `json:"name" binding:"required"`
 	Method          string     `json:"method" binding:"required"`
 	Category        string     `json:"category" binding:"required"`
@@ -36,11 +43,13 @@ type CreateTransactionRequest struct {
 	Notes           string     `json:"notes"`
 	ReceiptURL      string     `json:"receipt_url"`
 	TransactionDate time.Time  `json:"transaction_date"`
+	Date            *time.Time `json:"date"`
 }
 
 // UpdateTransactionRequest represents the data needed to update a transaction
 type UpdateTransactionRequest struct {
 	Amount          float64    `json:"amount" binding:"omitempty,gt=0"`
+	Type            string     `json:"type" binding:"omitempty,oneof=income expense"`
 	Name            string     `json:"name"`
 	Method          string     `json:"method"`
 	Category        string     `json:"category"`
@@ -84,8 +93,17 @@ func (s *transactionService) CreateTransaction(userID uuid.UUID, req CreateTrans
 		status = "Completed"
 	}
 
+	// Set default type if not provided
+	txType := req.Type
+	if txType != "income" && txType != "expense" {
+		txType = "expense"
+	}
+
 	// Set transaction date to now if not provided
 	transactionDate := req.TransactionDate
+	if req.Date != nil && !req.Date.IsZero() {
+		transactionDate = *req.Date
+	}
 	if transactionDate.IsZero() {
 		transactionDate = time.Now()
 	}
@@ -94,6 +112,7 @@ func (s *transactionService) CreateTransaction(userID uuid.UUID, req CreateTrans
 		UserID:          userID,
 		WalletID:        req.WalletID,
 		Amount:          req.Amount,
+		Type:            txType,
 		Name:            req.Name,
 		Method:          req.Method,
 		Category:        req.Category,
@@ -109,12 +128,13 @@ func (s *transactionService) CreateTransaction(userID uuid.UUID, req CreateTrans
 
 	// Update wallet balance only if transaction is completed and wallet is specified
 	if status == "Completed" && req.WalletID != nil {
-		// Note: The model doesn't have a Type field to determine if income/expense
-		// This would need to be determined by the Method or another field
-		// For now, we'll comment this out until the business logic is clarified
-		// if err := s.walletRepo.UpdateBalance(*req.WalletID, balanceChange); err != nil {
-		// 	return nil, errors.New("failed to update wallet balance")
-		// }
+		balanceChange := req.Amount
+		if txType == "expense" {
+			balanceChange = -req.Amount
+		}
+		if err := s.walletRepo.UpdateBalance(*req.WalletID, balanceChange); err != nil {
+			return nil, errors.New("failed to update wallet balance")
+		}
 	}
 
 	return &transaction, nil
@@ -139,7 +159,7 @@ func (s *transactionService) GetUserTransactions(userID uuid.UUID, limit, offset
 }
 
 // GetUserTransactionsWithCount retrieves transactions and total count for pagination
-func (s *transactionService) GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+func (s *transactionService) GetUserTransactionsWithCount(userID uuid.UUID, limit, offset int, filter TransactionFilter) ([]*models.Transaction, int64, error) {
 	// Set default limit if not provided or invalid
 	if limit <= 0 {
 		limit = 50
@@ -149,13 +169,13 @@ func (s *transactionService) GetUserTransactionsWithCount(userID uuid.UUID, limi
 	}
 
 	// Get transactions
-	transactions, err := s.transactionRepo.FindByUserID(userID, limit, offset)
+	transactions, err := s.transactionRepo.FindByUserIDAndDateRange(userID, limit, offset, filter.StartDate, filter.EndDate)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// Get total count
-	total, err := s.transactionRepo.CountByUserID(userID)
+	total, err := s.transactionRepo.CountByUserIDAndDateRange(userID, filter.StartDate, filter.EndDate)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -193,6 +213,9 @@ func (s *transactionService) UpdateTransaction(id, userID uuid.UUID, req UpdateT
 	// Update fields if provided
 	if req.Amount > 0 {
 		transaction.Amount = req.Amount
+	}
+	if req.Type == "income" || req.Type == "expense" {
+		transaction.Type = req.Type
 	}
 	if req.Name != "" {
 		transaction.Name = req.Name
@@ -260,10 +283,11 @@ func (s *transactionService) GetTransactionStats(userID uuid.UUID, startDate, en
 			(endDate.IsZero() || txn.TransactionDate.Before(endDate) || txn.TransactionDate.Equal(endDate)) {
 
 			stats.TransactionCount++
-			// Note: The Transaction model doesn't have a Type field
-			// Income vs Expense would need to be determined by Method or Category
-			// For now, we'll just count all as expenses
-			stats.TotalExpense += txn.Amount
+			if txn.Type == "income" {
+				stats.TotalIncome += txn.Amount
+			} else {
+				stats.TotalExpense += txn.Amount
+			}
 		}
 	}
 

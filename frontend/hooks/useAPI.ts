@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 interface UseAPIOptions {
   auto?: boolean; // Auto-fetch on mount
+  deps?: any[]; // Dependencies that trigger a refetch when changed
 }
 
 interface UseAPIReturn<T> {
@@ -45,7 +46,7 @@ export function useAPI<T>(
     if (options.auto) {
       fetchData();
     }
-  }, []);
+  }, options.deps || []);
 
   return {
     data,

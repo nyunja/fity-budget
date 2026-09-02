@@ -348,13 +348,22 @@ export const walletsAPI = {
 
 // Analytics API
 export const analyticsAPI = {
-  getDashboard: async () => {
-    return apiRequest('/analytics/dashboard', {
+  getDashboard: async (params?: { start_date?: string; end_date?: string }) => {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          queryParams.append(key, value);
+        }
+      });
+    }
+    const query = queryParams.toString();
+    return apiRequest(`/analytics/dashboard${query ? `?${query}` : ''}`, {
       method: 'GET',
     });
   },
 
-  getMoneyFlow: async (params?: { start_date?: string; end_date?: string }) => {
+  getMoneyFlow: async (params?: { start_date?: string; end_date?: string; period?: string }) => {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

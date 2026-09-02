@@ -284,7 +284,7 @@ func TestAnalyticsHandler_GetDashboard(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	mockService := &mocks.MockAnalyticsService{}
-	mockService.GetDashboardSummaryFunc = func(userID uuid.UUID) (*services.DashboardSummary, error) {
+	mockService.GetDashboardSummaryFunc = func(userID uuid.UUID, startDate, endDate time.Time) (*services.DashboardSummary, error) {
 		return &services.DashboardSummary{
 			TotalBalance: 15700.00,
 			TotalIncome:  8500.00,

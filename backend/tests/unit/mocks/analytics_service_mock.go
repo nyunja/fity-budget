@@ -9,16 +9,16 @@ import (
 
 // MockAnalyticsService is a mock implementation of AnalyticsService
 type MockAnalyticsService struct {
-	GetDashboardSummaryFunc      func(userID uuid.UUID) (*services.DashboardSummary, error)
+	GetDashboardSummaryFunc      func(userID uuid.UUID, startDate, endDate time.Time) (*services.DashboardSummary, error)
 	GetSpendingByCategoryFunc    func(userID uuid.UUID, startDate, endDate time.Time) ([]*services.CategorySpending, error)
-	GetIncomeVsExpenseFunc       func(userID uuid.UUID, period string) (*services.IncomeVsExpenseReport, error)
+	GetIncomeVsExpenseFunc       func(userID uuid.UUID, startDate, endDate time.Time) (*services.IncomeVsExpenseReport, error)
 	GetMonthlyTrendsFunc         func(userID uuid.UUID, months int) (*services.MonthlyTrends, error)
 	GetFinancialHealthScoreFunc  func(userID uuid.UUID) (*services.FinancialHealthScore, error)
 }
 
-func (m *MockAnalyticsService) GetDashboardSummary(userID uuid.UUID) (*services.DashboardSummary, error) {
+func (m *MockAnalyticsService) GetDashboardSummary(userID uuid.UUID, startDate, endDate time.Time) (*services.DashboardSummary, error) {
 	if m.GetDashboardSummaryFunc != nil {
-		return m.GetDashboardSummaryFunc(userID)
+		return m.GetDashboardSummaryFunc(userID, startDate, endDate)
 	}
 	return nil, nil
 }
@@ -30,9 +30,9 @@ func (m *MockAnalyticsService) GetSpendingByCategory(userID uuid.UUID, startDate
 	return nil, nil
 }
 
-func (m *MockAnalyticsService) GetIncomeVsExpense(userID uuid.UUID, period string) (*services.IncomeVsExpenseReport, error) {
+func (m *MockAnalyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time) (*services.IncomeVsExpenseReport, error) {
 	if m.GetIncomeVsExpenseFunc != nil {
-		return m.GetIncomeVsExpenseFunc(userID, period)
+		return m.GetIncomeVsExpenseFunc(userID, startDate, endDate)
 	}
 	return nil, nil
 }

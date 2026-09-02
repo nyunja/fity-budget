@@ -24,17 +24,20 @@ func NewTransactionHandler(transactionService services.TransactionService) *Tran
 type CreateTransactionRequest struct {
 	WalletID        *uuid.UUID `json:"wallet_id"`
 	Amount          float64    `json:"amount" binding:"required,gt=0"`
-	Name     string     `json:"name" binding:"required"`
+	Type            string     `json:"type" binding:"omitempty,oneof=income expense"`
+	Name            string     `json:"name" binding:"required"`
 	Method          string     `json:"method"`
 	Category        string     `json:"category" binding:"required"`
 	Status          string     `json:"status" binding:"omitempty,oneof=Completed Pending Failed"`
 	Notes           string     `json:"notes"`
 	ReceiptURL      string     `json:"receipt_url"`
 	TransactionDate *time.Time `json:"transaction_date"`
+	Date            *time.Time `json:"date"`
 }
 
 type UpdateTransactionRequest struct {
 	Amount          float64    `json:"amount" binding:"omitempty,gt=0"`
+	Type            string     `json:"type" binding:"omitempty,oneof=income expense"`
 	Name            string     `json:"name"`
 	Method          string     `json:"method"`
 	Category        string     `json:"category"`
@@ -53,6 +56,8 @@ type UpdateTransactionRequest struct {
 // @Security BearerAuth
 // @Param page query int false "Page number" default(1)
 // @Param limit query int false "Items per page" default(20)
+// @Param start_date query string false "Start date (RFC3339 or YYYY-MM-DD)"
+// @Param end_date query string false "End date, inclusive (RFC3339 or YYYY-MM-DD)"
 // @Success 200 {object} utils.Response{data=object{data=[]models.Transaction,pagination=object}}
 // @Failure 401 {object} utils.Response
 // @Failure 500 {object} utils.Response
@@ -77,7 +82,12 @@ func (h *TransactionHandler) ListTransactions(c *gin.Context) {
 
 	offset := (page - 1) * limit
 
-	transactions, total, err := h.transactionService.GetUserTransactionsWithCount(userID, limit, offset)
+	filter := services.TransactionFilter{
+		StartDate: parseQueryDate(c.Query("start_date"), false),
+		EndDate:   parseQueryDate(c.Query("end_date"), true),
+	}
+
+	transactions, total, err := h.transactionService.GetUserTransactionsWithCount(userID, limit, offset, filter)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "FETCH_FAILED", err.Error())
 		return
@@ -175,6 +185,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 	serviceReq := services.CreateTransactionRequest{
 		WalletID:        req.WalletID,
 		Amount:          req.Amount,
+		Type:            req.Type,
 		Name:            req.Name,
 		Method:          req.Method,
 		Category:        req.Category,
@@ -182,6 +193,7 @@ func (h *TransactionHandler) CreateTransaction(c *gin.Context) {
 		Notes:           req.Notes,
 		ReceiptURL:      req.ReceiptURL,
 		TransactionDate: transactionDate,
+		Date:            req.Date,
 	}
 
 	transaction, err := h.transactionService.CreateTransaction(userID, serviceReq)
@@ -236,6 +248,7 @@ func (h *TransactionHandler) UpdateTransaction(c *gin.Context) {
 
 	serviceReq := services.UpdateTransactionRequest{
 		Amount:          req.Amount,
+		Type:            req.Type,
 		Name:            req.Name,
 		Method:          req.Method,
 		Category:        req.Category,
@@ -292,11 +305,13 @@ func (h *TransactionHandler) DeleteTransaction(c *gin.Context) {
 
 // GetTransactionStats godoc
 // @Summary Get transaction statistics
-// @Description Get transaction statistics for the current month
+// @Description Get transaction statistics for a date range (defaults to current month)
 // @Tags transactions
 // @Accept json
 // @Produce json
 // @Security BearerAuth
+// @Param start_date query string false "Start date (RFC3339 or YYYY-MM-DD)"
+// @Param end_date query string false "End date, inclusive (RFC3339 or YYYY-MM-DD)"
 // @Success 200 {object} utils.Response{data=object{stats=object}}
 // @Failure 401 {object} utils.Response
 // @Failure 500 {object} utils.Response
@@ -308,10 +323,17 @@ func (h *TransactionHandler) GetTransactionStats(c *gin.Context) {
 		return
 	}
 
-	// Get current month date range
+	// Get date range, defaulting to the current month
 	now := time.Now()
 	startDate := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
 	endDate := startDate.AddDate(0, 1, 0)
+
+	if parsed := parseQueryDate(c.Query("start_date"), false); parsed != nil {
+		startDate = *parsed
+	}
+	if parsed := parseQueryDate(c.Query("end_date"), true); parsed != nil {
+		endDate = *parsed
+	}
 
 	stats, err := h.transactionService.GetTransactionStats(userID, startDate, endDate)
 	if err != nil {

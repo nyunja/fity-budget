@@ -2,11 +2,14 @@ import { useMemo } from 'react';
 import { Transaction, SavingGoal, Budget } from '../../../types';
 import { useAPI } from '../../../hooks/useAPI';
 import { transactionsAPI, goalsAPI, budgetsAPI } from '../../../services/api';
+import { usePeriod } from '../../../contexts/PeriodContext';
 
 export const useAnalyticsData = () => {
-    const { data: transactionsData } = useAPI<{ transactions: Transaction[] }>(
-        () => transactionsAPI.list(),
-        { auto: true }
+    const { startDate, endDate } = usePeriod();
+
+    const { data: transactionsData } = useAPI<{ data: Transaction[] }>(
+        () => transactionsAPI.list({ start_date: startDate, end_date: endDate }),
+        { auto: true, deps: [startDate, endDate] }
     );
 
     const { data: goalsData } = useAPI<{ goals: SavingGoal[] }>(
@@ -19,12 +22,23 @@ export const useAnalyticsData = () => {
         { auto: true }
     );
 
+    // The UI derives income/expense from the sign; the backend stores
+    // unsigned amounts with an explicit type, so sign the amounts here.
+    const transactions: Transaction[] = (transactionsData?.data || []).map((tx: any) => {
+        const amount = Math.abs(tx.amount || 0);
+        return {
+            ...tx,
+            amount: tx.type === 'income' ? amount : -amount,
+            type: tx.type === 'income' ? 'income' : 'expense',
+        } as Transaction;
+    });
+
     // We could also fetch specific analytics endpoints if available, but for now we'll calculate from raw data
     // to match existing logic, or use the analyticsAPI if it provides pre-calculated values.
     // The existing code calculates metrics on the frontend, so we'll stick to that for now using the fetched lists.
 
     return {
-        transactions: transactionsData?.transactions || [],
+        transactions,
         goals: goalsData?.goals || [],
         budgets: budgetsData?.budgets || []
     }

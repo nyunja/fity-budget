@@ -35,7 +35,14 @@ export const useDashboardOverview = () => {
     { auto: isAuthenticated }
   );
 
-  const transactions = recentTransactions?.data || [];
+  const transactions: Transaction[] = (recentTransactions?.data || []).map((tx: any) => {
+    const amount = Math.abs(tx.amount || 0);
+    return {
+      ...tx,
+      amount: tx.type === 'income' ? amount : -amount,
+      type: tx.type === 'income' ? 'income' : 'expense',
+    } as Transaction;
+  });
 
   // Transform goals data: backend returns target_amount/current_amount, frontend expects target/current
   const goals: SavingGoal[] = goalsData?.goals?.map(goal => ({

@@ -42,6 +42,16 @@ func main() {
 		log.Fatalf("❌ Migration failed: %v", err)
 	}
 
+	// Backfill the transaction type column for pre-existing rows.
+	// Historical transactions have no income/expense information, so they
+	// default to "expense" and can be corrected manually if needed.
+	log.Println("\nBackfilling transaction types...")
+	if err := db.Exec("UPDATE transactions SET type = 'expense' WHERE type IS NULL OR type = ''").Error; err != nil {
+		log.Printf("Warning: transaction type backfill failed: %v", err)
+	} else {
+		log.Println("✅ Transaction types backfilled (defaults to expense)")
+	}
+
 	log.Println("\n✅ All migrations completed successfully!")
 	log.Println("\nTables created:")
 	log.Println("  - users")

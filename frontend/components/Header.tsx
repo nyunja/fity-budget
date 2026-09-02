@@ -1,15 +1,26 @@
 import React from 'react';
 import { Search, Bell, Grid, Plus, Sparkles, Loader2 } from 'lucide-react';
 import { User } from '../types';
+import { usePeriod, Period } from '../contexts/PeriodContext';
 
 interface HeaderProps {
   onGenerateInsights: () => void;
   isGenerating: boolean;
   insight: string | null;
   user: User;
+  showPeriodFilter?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insight, user }) => {
+const PERIOD_OPTIONS: { label: string; value: Period }[] = [
+  { label: 'Day', value: 'day' },
+  { label: 'Week', value: 'week' },
+  { label: 'Month', value: 'month' },
+  { label: 'Year', value: 'year' },
+];
+
+const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insight, user, showPeriodFilter = true }) => {
+  const { period, setPeriod } = usePeriod();
+
   return (
     <div className="flex flex-col gap-6">
       {/* Top Row: Welcome & Profile */}
@@ -56,13 +67,23 @@ const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insig
 
       {/* Second Row: Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm w-full sm:w-auto transition-colors">
-           {/* Simple Date Select Simulation */}
-          <button className="px-4 py-2 rounded-full bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">Day</button>
-          <button className="px-4 py-2 rounded-full bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">Week</button>
-          <button className="px-4 py-2 rounded-full bg-gray-900 dark:bg-gray-700 text-white text-sm font-medium shadow-md">Month</button>
-          <button className="px-4 py-2 rounded-full bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300">Year</button>
-        </div>
+        {showPeriodFilter && (
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm w-full sm:w-auto transition-colors">
+            {PERIOD_OPTIONS.map(({ label, value }) => (
+              <button
+                key={value}
+                onClick={() => setPeriod(value)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  period === value
+                    ? 'bg-gray-900 dark:bg-gray-700 text-white shadow-md'
+                    : 'bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
             <button 

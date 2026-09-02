@@ -21,11 +21,13 @@ func NewAnalyticsHandler(analyticsService services.AnalyticsService) *AnalyticsH
 
 // GetDashboardStats godoc
 // @Summary Get dashboard statistics
-// @Description Get comprehensive financial statistics for the dashboard
+// @Description Get comprehensive financial statistics for the dashboard for a date range (defaults to current month)
 // @Tags analytics
 // @Accept json
 // @Produce json
 // @Security BearerAuth
+// @Param start_date query string false "Start date (RFC3339 or YYYY-MM-DD)"
+// @Param end_date query string false "End date, inclusive (RFC3339 or YYYY-MM-DD)"
 // @Success 200 {object} utils.Response{data=object{dashboard=object}}
 // @Failure 401 {object} utils.Response
 // @Failure 500 {object} utils.Response
@@ -37,7 +39,18 @@ func (h *AnalyticsHandler) GetDashboardStats(c *gin.Context) {
 		return
 	}
 
-	summary, err := h.analyticsService.GetDashboardSummary(userID)
+	startDate := parseQueryDate(c.Query("start_date"), false)
+	if startDate == nil {
+		zero := time.Time{}
+		startDate = &zero
+	}
+	endDate := parseQueryDate(c.Query("end_date"), true)
+	if endDate == nil {
+		zero := time.Time{}
+		endDate = &zero
+	}
+
+	summary, err := h.analyticsService.GetDashboardSummary(userID, *startDate, *endDate)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "DASHBOARD_FAILED", err.Error())
 		return
@@ -55,7 +68,9 @@ func (h *AnalyticsHandler) GetDashboardStats(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param period query string false "Time period" Enums(7days, 1month, 6months, 1year) default(6months)
+// @Param period query string false "Time period (ignored when start_date/end_date are provided)" Enums(7days, 1month, 6months, 1year) default(6months)
+// @Param start_date query string false "Start date (RFC3339 or YYYY-MM-DD)"
+// @Param end_date query string false "End date, inclusive (RFC3339 or YYYY-MM-DD)"
 // @Success 200 {object} utils.Response{data=object{data=object}}
 // @Failure 401 {object} utils.Response
 // @Failure 500 {object} utils.Response
@@ -64,6 +79,21 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
 	if err != nil {
 		utils.Error(c, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
+		return
+	}
+
+	now := time.Now()
+	startDate := parseQueryDate(c.Query("start_date"), false)
+	endDate := parseQueryDate(c.Query("end_date"), true)
+
+	// Explicit date range wins over the period parameter
+	if startDate != nil && endDate != nil {
+		incomeExpense, err := h.analyticsService.GetIncomeVsExpense(userID, *startDate, *endDate)
+		if err != nil {
+			utils.Error(c, http.StatusInternalServerError, "MONEY_FLOW_FAILED", err.Error())
+			return
+		}
+		utils.Success(c, http.StatusOK, gin.H{"data": incomeExpense})
 		return
 	}
 
@@ -86,7 +116,13 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 	var report interface{}
 	if period == "7days" || period == "1month" {
 		// Use income vs expense for short periods
-		incomeExpense, err := h.analyticsService.GetIncomeVsExpense(userID, period)
+		var start time.Time
+		if period == "7days" {
+			start = now.AddDate(0, 0, -7)
+		} else {
+			start = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		}
+		incomeExpense, err := h.analyticsService.GetIncomeVsExpense(userID, start, now)
 		if err != nil {
 			utils.Error(c, http.StatusInternalServerError, "MONEY_FLOW_FAILED", err.Error())
 			return
@@ -114,7 +150,9 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param period query string false "Time period" Enums(7days, 1month, 3months, 6months, 1year) default(1month)
+// @Param period query string false "Time period (ignored when start_date/end_date are provided)" Enums(7days, 1month, 3months, 6months, 1year) default(1month)
+// @Param start_date query string false "Start date (RFC3339 or YYYY-MM-DD)"
+// @Param end_date query string false "End date, inclusive (RFC3339 or YYYY-MM-DD)"
 // @Success 200 {object} utils.Response{data=object{total_spending=number,by_category=[]object}}
 // @Failure 401 {object} utils.Response
 // @Failure 500 {object} utils.Response
@@ -126,29 +164,41 @@ func (h *AnalyticsHandler) GetSpendingAnalysis(c *gin.Context) {
 		return
 	}
 
-	// Get period parameter (default: 1month)
-	period := c.DefaultQuery("period", "1month")
-
-	// Calculate date range based on period
 	now := time.Now()
 	var startDate time.Time
+	var endDate time.Time
 
-	switch period {
-	case "7days":
-		startDate = now.AddDate(0, 0, -7)
-	case "1month":
-		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
-	case "3months":
-		startDate = now.AddDate(0, -3, 0)
-	case "6months":
-		startDate = now.AddDate(0, -6, 0)
-	case "1year":
-		startDate = time.Date(now.Year(), 1, 1, 0, 0, 0, 0, now.Location())
-	default:
-		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	if parsed := parseQueryDate(c.Query("start_date"), false); parsed != nil {
+		startDate = *parsed
+	}
+	if parsed := parseQueryDate(c.Query("end_date"), true); parsed != nil {
+		endDate = *parsed
 	}
 
-	categories, err := h.analyticsService.GetSpendingByCategory(userID, startDate, now)
+	// Fall back to the period parameter when explicit dates are missing
+	if startDate.IsZero() || endDate.IsZero() {
+		// Get period parameter (default: 1month)
+		period := c.DefaultQuery("period", "1month")
+
+		startDate = time.Time{}
+		switch period {
+		case "7days":
+			startDate = now.AddDate(0, 0, -7)
+		case "1month":
+			startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		case "3months":
+			startDate = now.AddDate(0, -3, 0)
+		case "6months":
+			startDate = now.AddDate(0, -6, 0)
+		case "1year":
+			startDate = time.Date(now.Year(), 1, 1, 0, 0, 0, 0, now.Location())
+		default:
+			startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+		}
+		endDate = now
+	}
+
+	categories, err := h.analyticsService.GetSpendingByCategory(userID, startDate, endDate)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "SPENDING_ANALYSIS_FAILED", err.Error())
 		return

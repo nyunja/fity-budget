@@ -33,7 +33,7 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockTransactionService) {
-				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int, filter services.TransactionFilter) ([]*models.Transaction, int64, error) {
 					return []*models.Transaction{
 						{
 							ID:              testutils.TestTransactionID,
@@ -73,7 +73,7 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockTransactionService) {
-				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int, filter services.TransactionFilter) ([]*models.Transaction, int64, error) {
 					if limit != 10 || offset != 10 {
 						t.Errorf("Expected limit=10 and offset=10, got limit=%d, offset=%d", limit, offset)
 					}
@@ -111,7 +111,7 @@ func TestTransactionHandler_ListTransactions(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockTransactionService) {
-				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int) ([]*models.Transaction, int64, error) {
+				m.GetUserTransactionsWithCountFunc = func(userID uuid.UUID, limit, offset int, filter services.TransactionFilter) ([]*models.Transaction, int64, error) {
 					return nil, 0, errors.New("database error")
 				}
 			},

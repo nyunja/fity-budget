@@ -15,6 +15,7 @@ import { HelpPage } from './features/help';
 
 import { getFinancialInsights } from './services/geminiService';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { PeriodProvider, usePeriod } from './contexts/PeriodContext';
 import { User, StatMetric, Transaction, SavingGoal, MoneyFlowData, BudgetCategory, ViewState, Budget, WalletAccount } from './types';
 import { useAPI } from './hooks/useAPI';
 import { analyticsAPI, transactionsAPI, goalsAPI, budgetsAPI, walletsAPI, authAPI } from './services/api';
@@ -22,6 +23,7 @@ import { analyticsAPI, transactionsAPI, goalsAPI, budgetsAPI, walletsAPI, authAP
 // Main App Content Component
 const AppContent: React.FC = () => {
   const { user, isAuthenticated, login, logout, register } = useAuth();
+  const { startDate, endDate } = usePeriod();
 
   // App State
   const [view, setView] = useState<ViewState>('login');
@@ -32,13 +34,13 @@ const AppContent: React.FC = () => {
 
   // Fetch data for insights generation (Header component)
   const { data: dashboardData } = useAPI<{ stats: StatMetric[] }>(
-    () => analyticsAPI.getDashboard(),
-    { auto: isAuthenticated }
+    () => analyticsAPI.getDashboard({ start_date: startDate, end_date: endDate }),
+    { auto: isAuthenticated, deps: [isAuthenticated, startDate, endDate] }
   );
 
   const { data: recentTransactions } = useAPI<{ transactions: Transaction[] }>(
-    () => transactionsAPI.list({ limit: 5 }),
-    { auto: isAuthenticated }
+    () => transactionsAPI.list({ limit: 5, start_date: startDate, end_date: endDate }),
+    { auto: isAuthenticated, deps: [isAuthenticated, startDate, endDate] }
   );
 
   const { data: goalsData } = useAPI<{ goals: SavingGoal[] }>(
@@ -193,6 +195,7 @@ const AppContent: React.FC = () => {
               onGenerateInsights={handleGenerateInsights}
               isGenerating={isGenerating}
               insight={insight}
+              showPeriodFilter={view !== 'settings'}
             />
           )}
         </div>
@@ -254,7 +257,9 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <AppContent />
+      <PeriodProvider>
+        <AppContent />
+      </PeriodProvider>
     </AuthProvider>
   );
 };
