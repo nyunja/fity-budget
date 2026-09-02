@@ -8,7 +8,7 @@ interface DashboardStatsProps {
 
 const DashboardStats: React.FC<DashboardStatsProps> = ({ stats }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-6">
       {stats.map((stat, index) => (
         <StatCard key={index} {...stat} />
       ))}

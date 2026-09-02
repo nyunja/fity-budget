@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Wallet, Menu } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/dashboard/Dashboard';
@@ -21,7 +21,7 @@ import { analyticsAPI, goalsAPI, authAPI } from './services/api';
 
 // Main App Content Component
 const AppContent: React.FC = () => {
-  const { user, isAuthenticated, login, logout, register } = useAuth();
+  const { user, isAuthenticated, isLoading, login, logout, register } = useAuth();
 
   // App State
   const [view, setView] = useState<ViewState>('login');
@@ -147,6 +147,15 @@ const AppContent: React.FC = () => {
   const handleUpdateWallet = () => { };
   const handleDeleteWallet = () => { };
 
+  // Session restore: don't flash the login screen while checking the token
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#F8F9FD] dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+      </div>
+    );
+  }
+
   // Auth Views
   if (view === 'login') return <Login onLogin={handleLogin} onSwitchToRegister={() => setView('register')} />;
   if (view === 'register') return <Register onRegister={handleRegister} onSwitchToLogin={() => setView('login')} />;
@@ -167,15 +176,7 @@ const AppContent: React.FC = () => {
 
       <div className="flex-1 lg:ml-64 relative">
         {/* Sticky Header Container with Blur */}
-        <div className="sticky top-0 z-10 relative bg-[#F8F9FD]/90 dark:bg-gray-900/90 backdrop-blur-md p-4 pl-16 md:p-8 md:pl-16 lg:pl-8 pb-4">
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setIsMobileNavOpen(true)}
-            className="lg:hidden absolute left-4 top-4 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 shadow-sm"
-            aria-label="Open navigation menu"
-          >
-            <Menu size={20} />
-          </button>
+        <div className="sticky top-0 z-10 relative bg-[#F8F9FD]/90 dark:bg-gray-900/90 backdrop-blur-md p-4 md:p-8 pb-4">
           {user && (
             <Header
               user={user}
@@ -183,6 +184,7 @@ const AppContent: React.FC = () => {
               isGenerating={isGenerating}
               insight={insight}
               showPeriodFilter={view !== 'settings'}
+              onMenuClick={() => setIsMobileNavOpen(true)}
             />
           )}
         </div>

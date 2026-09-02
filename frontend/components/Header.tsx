@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, Grid, Plus, Sparkles, Loader2 } from 'lucide-react';
+import { Search, Bell, Grid, Plus, Sparkles, Loader2, Menu } from 'lucide-react';
 import { User } from '../types';
 import { usePeriod, Period } from '../contexts/PeriodContext';
 
@@ -9,6 +9,7 @@ interface HeaderProps {
   insight: string | null;
   user: User;
   showPeriodFilter?: boolean;
+  onMenuClick?: () => void;
 }
 
 const PERIOD_OPTIONS: { label: string; value: Period }[] = [
@@ -18,16 +19,27 @@ const PERIOD_OPTIONS: { label: string; value: Period }[] = [
   { label: 'Year', value: 'year' },
 ];
 
-const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insight, user, showPeriodFilter = true }) => {
+const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insight, user, showPeriodFilter = true, onMenuClick }) => {
   const { period, setPeriod } = usePeriod();
 
   return (
     <div className="flex flex-col gap-6">
       {/* Top Row: Welcome & Profile */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user.name}!</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">It is the best time to manage your finances</p>
+        <div className="flex items-start gap-3 min-w-0">
+          {onMenuClick && (
+            <button
+              onClick={onMenuClick}
+              className="lg:hidden shrink-0 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 shadow-sm"
+              aria-label="Open navigation menu"
+            >
+              <Menu size={20} />
+            </button>
+          )}
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user.name}!</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">It is the best time to manage your finances</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-4 self-end md:self-auto">

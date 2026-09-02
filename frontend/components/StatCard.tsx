@@ -7,7 +7,7 @@ const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection })
   const isPositive = trendDirection === 'up';
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
+    <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-gray-500 dark:text-gray-400 font-medium text-sm">{label}</h3>
         <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors cursor-pointer">
@@ -16,7 +16,7 @@ const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection })
       </div>
       
       <div className="space-y-3">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white break-words">
           {cur()}{value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </h2>
         
