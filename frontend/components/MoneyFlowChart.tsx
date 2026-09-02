@@ -1,8 +1,9 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { MoneyFlowData } from '../types';
-import { ChevronDown, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useNavigation } from '../contexts/NavigationContext';
+import AccountFilter from './AccountFilter';
 
 interface MoneyFlowChartProps {
   data: MoneyFlowData[];
@@ -34,11 +35,7 @@ const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({ data }) => {
                 <span className="text-gray-600 dark:text-gray-300">Expense</span>
              </div>
           </div>
-          <div className="flex gap-2">
-              <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                All accounts <ChevronDown size={12} />
-              </button>
-          </div>
+          <AccountFilter />
         </div>
       </div>
 

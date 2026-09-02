@@ -9,10 +9,11 @@ import (
 	"github.com/nyunja/fity-budget-backend/internal/repository"
 )
 
-// TransactionFilter holds optional date-range filters for listing transactions
+// TransactionFilter holds optional filters for listing transactions
 type TransactionFilter struct {
 	StartDate *time.Time
 	EndDate   *time.Time
+	WalletID  *uuid.UUID
 }
 
 // TransactionService defines the interface for transaction operations
@@ -169,13 +170,13 @@ func (s *transactionService) GetUserTransactionsWithCount(userID uuid.UUID, limi
 	}
 
 	// Get transactions
-	transactions, err := s.transactionRepo.FindByUserIDAndDateRange(userID, limit, offset, filter.StartDate, filter.EndDate)
+	transactions, err := s.transactionRepo.FindByUserIDWalletAndDateRange(userID, filter.WalletID, limit, offset, filter.StartDate, filter.EndDate)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	// Get total count
-	total, err := s.transactionRepo.CountByUserIDAndDateRange(userID, filter.StartDate, filter.EndDate)
+	total, err := s.transactionRepo.CountByUserIDWalletAndDateRange(userID, filter.WalletID, filter.StartDate, filter.EndDate)
 	if err != nil {
 		return nil, 0, err
 	}

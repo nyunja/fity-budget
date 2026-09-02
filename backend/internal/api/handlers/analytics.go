@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/nyunja/fity-budget-backend/internal/api/middleware"
 	"github.com/nyunja/fity-budget-backend/internal/services"
 	"github.com/nyunja/fity-budget-backend/internal/utils"
@@ -89,9 +90,20 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 	startDate := parseQueryDate(c.Query("start_date"), false)
 	endDate := parseQueryDate(c.Query("end_date"), true)
 
+	// Optional wallet filter
+	var walletID *uuid.UUID
+	if walletIDStr := c.Query("wallet_id"); walletIDStr != "" {
+		parsed, err := uuid.Parse(walletIDStr)
+		if err != nil {
+			utils.Error(c, http.StatusBadRequest, "INVALID_WALLET_ID", "wallet_id must be a valid UUID")
+			return
+		}
+		walletID = &parsed
+	}
+
 	// Explicit date range wins over the period parameter
 	if startDate != nil && endDate != nil {
-		incomeExpense, err := h.analyticsService.GetIncomeVsExpense(userID, *startDate, *endDate)
+		incomeExpense, err := h.analyticsService.GetIncomeVsExpense(userID, *startDate, *endDate, walletID)
 		if err != nil {
 			utils.Error(c, http.StatusInternalServerError, "MONEY_FLOW_FAILED", err.Error())
 			return
@@ -99,7 +111,6 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 		utils.Success(c, http.StatusOK, gin.H{"data": incomeExpense})
 		return
 	}
-
 	// Get period parameter (default: 6months)
 	period := c.DefaultQuery("period", "6months")
 
@@ -125,7 +136,7 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 		} else {
 			start = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
 		}
-		incomeExpense, err := h.analyticsService.GetIncomeVsExpense(userID, start, now)
+		incomeExpense, err := h.analyticsService.GetIncomeVsExpense(userID, start, now, walletID)
 		if err != nil {
 			utils.Error(c, http.StatusInternalServerError, "MONEY_FLOW_FAILED", err.Error())
 			return
@@ -133,7 +144,7 @@ func (h *AnalyticsHandler) GetMoneyFlow(c *gin.Context) {
 		report = incomeExpense
 	} else {
 		// Use monthly trends for longer periods
-		trends, err := h.analyticsService.GetMonthlyTrends(userID, months)
+		trends, err := h.analyticsService.GetMonthlyTrends(userID, months, walletID)
 		if err != nil {
 			utils.Error(c, http.StatusInternalServerError, "MONEY_FLOW_FAILED", err.Error())
 			return
@@ -330,7 +341,18 @@ func (h *AnalyticsHandler) GetTrends(c *gin.Context) {
 		months = 24 // Cap at 2 years
 	}
 
-	trends, err := h.analyticsService.GetMonthlyTrends(userID, months)
+	// Optional wallet filter
+	var walletID *uuid.UUID
+	if walletIDStr := c.Query("wallet_id"); walletIDStr != "" {
+		parsed, err := uuid.Parse(walletIDStr)
+		if err != nil {
+			utils.Error(c, http.StatusBadRequest, "INVALID_WALLET_ID", "wallet_id must be a valid UUID")
+			return
+		}
+		walletID = &parsed
+	}
+
+	trends, err := h.analyticsService.GetMonthlyTrends(userID, months, walletID)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "TRENDS_FAILED", err.Error())
 		return

@@ -12,8 +12,8 @@ import (
 type AnalyticsService interface {
 	GetDashboardSummary(userID uuid.UUID, startDate, endDate time.Time) (*DashboardSummary, error)
 	GetSpendingByCategory(userID uuid.UUID, startDate, endDate time.Time) ([]*CategorySpending, error)
-	GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time) (*IncomeVsExpenseReport, error)
-	GetMonthlyTrends(userID uuid.UUID, months int) (*MonthlyTrends, error)
+	GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time, walletID *uuid.UUID) (*IncomeVsExpenseReport, error)
+	GetMonthlyTrends(userID uuid.UUID, months int, walletID *uuid.UUID) (*MonthlyTrends, error)
 	GetFinancialHealthScore(userID uuid.UUID) (*FinancialHealthScore, error)
 }
 
@@ -22,6 +22,15 @@ type analyticsService struct {
 	walletRepo      repository.WalletRepository
 	budgetRepo      repository.BudgetRepository
 	goalRepo        repository.GoalRepository
+}
+
+// getTransactionsForAnalytics fetches all user transactions, optionally
+// scoped to a single wallet for per-account analytics
+func (s *analyticsService) getTransactionsForAnalytics(userID uuid.UUID, walletID *uuid.UUID) ([]*models.Transaction, error) {
+	if walletID != nil {
+		return s.transactionRepo.FindByUserIDAndWallet(userID, *walletID, 10000, 0)
+	}
+	return s.transactionRepo.FindByUserID(userID, 10000, 0)
 }
 
 // DashboardSummary represents the main dashboard overview
@@ -266,7 +275,7 @@ func (s *analyticsService) GetSpendingByCategory(userID uuid.UUID, startDate, en
 }
 
 // GetIncomeVsExpense retrieves income vs expense report for the given date range
-func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time) (*IncomeVsExpenseReport, error) {
+func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time, walletID *uuid.UUID) (*IncomeVsExpenseReport, error) {
 	now := time.Now()
 	if startDate.IsZero() {
 		startDate = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
@@ -279,7 +288,7 @@ func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDa
 		Period: startDate.Format("2006-01-02") + " to " + endDate.Format("2006-01-02"),
 	}
 
-	transactions, err := s.transactionRepo.FindByUserID(userID, 10000, 0)
+	transactions, err := s.getTransactionsForAnalytics(userID, walletID)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +331,7 @@ func (s *analyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDa
 }
 
 // GetMonthlyTrends retrieves monthly trend data
-func (s *analyticsService) GetMonthlyTrends(userID uuid.UUID, months int) (*MonthlyTrends, error) {
+func (s *analyticsService) GetMonthlyTrends(userID uuid.UUID, months int, walletID *uuid.UUID) (*MonthlyTrends, error) {
 	if months <= 0 {
 		months = 6
 	}
@@ -334,7 +343,7 @@ func (s *analyticsService) GetMonthlyTrends(userID uuid.UUID, months int) (*Mont
 		SavingsData: make([]float64, 0),
 	}
 
-	transactions, err := s.transactionRepo.FindByUserID(userID, 10000, 0)
+	transactions, err := s.getTransactionsForAnalytics(userID, walletID)
 	if err != nil {
 		return nil, err
 	}

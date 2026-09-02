@@ -11,8 +11,8 @@ import (
 type MockAnalyticsService struct {
 	GetDashboardSummaryFunc      func(userID uuid.UUID, startDate, endDate time.Time) (*services.DashboardSummary, error)
 	GetSpendingByCategoryFunc    func(userID uuid.UUID, startDate, endDate time.Time) ([]*services.CategorySpending, error)
-	GetIncomeVsExpenseFunc       func(userID uuid.UUID, startDate, endDate time.Time) (*services.IncomeVsExpenseReport, error)
-	GetMonthlyTrendsFunc         func(userID uuid.UUID, months int) (*services.MonthlyTrends, error)
+	GetIncomeVsExpenseFunc       func(userID uuid.UUID, startDate, endDate time.Time, walletID *uuid.UUID) (*services.IncomeVsExpenseReport, error)
+	GetMonthlyTrendsFunc         func(userID uuid.UUID, months int, walletID *uuid.UUID) (*services.MonthlyTrends, error)
 	GetFinancialHealthScoreFunc  func(userID uuid.UUID) (*services.FinancialHealthScore, error)
 }
 
@@ -30,16 +30,16 @@ func (m *MockAnalyticsService) GetSpendingByCategory(userID uuid.UUID, startDate
 	return nil, nil
 }
 
-func (m *MockAnalyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time) (*services.IncomeVsExpenseReport, error) {
+func (m *MockAnalyticsService) GetIncomeVsExpense(userID uuid.UUID, startDate, endDate time.Time, walletID *uuid.UUID) (*services.IncomeVsExpenseReport, error) {
 	if m.GetIncomeVsExpenseFunc != nil {
-		return m.GetIncomeVsExpenseFunc(userID, startDate, endDate)
+		return m.GetIncomeVsExpenseFunc(userID, startDate, endDate, walletID)
 	}
 	return nil, nil
 }
 
-func (m *MockAnalyticsService) GetMonthlyTrends(userID uuid.UUID, months int) (*services.MonthlyTrends, error) {
+func (m *MockAnalyticsService) GetMonthlyTrends(userID uuid.UUID, months int, walletID *uuid.UUID) (*services.MonthlyTrends, error) {
 	if m.GetMonthlyTrendsFunc != nil {
-		return m.GetMonthlyTrendsFunc(userID, months)
+		return m.GetMonthlyTrendsFunc(userID, months, walletID)
 	}
 	return nil, nil
 }

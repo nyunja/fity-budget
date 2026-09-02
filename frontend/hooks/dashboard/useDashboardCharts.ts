@@ -3,6 +3,7 @@ import { analyticsAPI, budgetsAPI } from '../../services/api';
 import { MoneyFlowData, BudgetCategory } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePeriod } from '../../contexts/PeriodContext';
+import { useAccountFilter } from '../../contexts/AccountFilterContext';
 
 interface MoneyFlowResponse {
   data: {
@@ -30,6 +31,7 @@ interface BudgetListResponse {
 export const useDashboardCharts = () => {
   const { isAuthenticated } = useAuth();
   const { startDate, endDate, period } = usePeriod();
+  const { walletId } = useAccountFilter();
 
   // Short periods use an explicit date range (daily data points);
   // year uses the monthly trends endpoint.
@@ -38,10 +40,10 @@ export const useDashboardCharts = () => {
   const { data: moneyFlowData, loading: moneyFlowLoading, error: moneyFlowError } = useAPI<MoneyFlowResponse>(
     () => analyticsAPI.getMoneyFlow(
       useDateRange
-        ? { start_date: startDate, end_date: endDate }
-        : { period: '1year' }
+        ? { start_date: startDate, end_date: endDate, wallet_id: walletId || undefined }
+        : { period: '1year', wallet_id: walletId || undefined }
     ),
-    { auto: isAuthenticated, deps: [isAuthenticated, startDate, endDate, useDateRange] }
+    { auto: isAuthenticated, deps: [isAuthenticated, startDate, endDate, useDateRange, walletId] }
   );
 
   const { data: budgetData, loading: budgetLoading, error: budgetError } = useAPI<BudgetListResponse>(

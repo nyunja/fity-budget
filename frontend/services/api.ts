@@ -363,7 +363,7 @@ export const analyticsAPI = {
     });
   },
 
-  getMoneyFlow: async (params?: { start_date?: string; end_date?: string; period?: string }) => {
+  getMoneyFlow: async (params?: { start_date?: string; end_date?: string; period?: string; wallet_id?: string }) => {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

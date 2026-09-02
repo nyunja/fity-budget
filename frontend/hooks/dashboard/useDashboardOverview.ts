@@ -2,6 +2,7 @@ import { useAPI } from '../useAPI';
 import { transactionsAPI, goalsAPI } from '../../services/api';
 import { Transaction, SavingGoal } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import { useAccountFilter } from '../../contexts/AccountFilterContext';
 
 interface TransactionsResponse {
   data: Transaction[];
@@ -24,10 +25,11 @@ interface GoalsResponse {
 
 export const useDashboardOverview = () => {
   const { isAuthenticated } = useAuth();
+  const { walletId } = useAccountFilter();
 
   const { data: recentTransactions, loading: transactionsLoading, error: transactionsError } = useAPI<TransactionsResponse>(
-    () => transactionsAPI.list({ limit: 5 }),
-    { auto: isAuthenticated }
+    () => transactionsAPI.list({ limit: 5, wallet_id: walletId || undefined }),
+    { auto: isAuthenticated, deps: [isAuthenticated, walletId] }
   );
 
   const { data: goalsData, loading: goalsLoading, error: goalsError } = useAPI<GoalsResponse>(

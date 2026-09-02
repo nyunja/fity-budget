@@ -14,8 +14,11 @@ type TransactionRepository interface {
 	FindByID(id uuid.UUID) (*models.Transaction, error)
 	FindByUserID(userID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
 	FindByUserIDAndDateRange(userID uuid.UUID, limit, offset int, startDate, endDate *time.Time) ([]*models.Transaction, error)
+	FindByUserIDWalletAndDateRange(userID uuid.UUID, walletID *uuid.UUID, limit, offset int, startDate, endDate *time.Time) ([]*models.Transaction, error)
+	FindByUserIDAndWallet(userID uuid.UUID, walletID uuid.UUID, limit, offset int) ([]*models.Transaction, error)
 	CountByUserID(userID uuid.UUID) (int64, error)
 	CountByUserIDAndDateRange(userID uuid.UUID, startDate, endDate *time.Time) (int64, error)
+	CountByUserIDWalletAndDateRange(userID uuid.UUID, walletID *uuid.UUID, startDate, endDate *time.Time) (int64, error)
 	FindAll() ([]*models.Transaction, error)
 	Update(transaction *models.Transaction) error
 	Delete(id uuid.UUID) error
@@ -47,8 +50,15 @@ func (r *transactionRepository) FindByUserID(userID uuid.UUID, limit, offset int
 }
 
 func (r *transactionRepository) FindByUserIDAndDateRange(userID uuid.UUID, limit, offset int, startDate, endDate *time.Time) ([]*models.Transaction, error) {
+	return r.FindByUserIDWalletAndDateRange(userID, nil, limit, offset, startDate, endDate)
+}
+
+func (r *transactionRepository) FindByUserIDWalletAndDateRange(userID uuid.UUID, walletID *uuid.UUID, limit, offset int, startDate, endDate *time.Time) ([]*models.Transaction, error) {
 	var transactions []*models.Transaction
 	query := r.db.Where("user_id = ?", userID)
+	if walletID != nil {
+		query = query.Where("wallet_id = ?", *walletID)
+	}
 	if startDate != nil {
 		query = query.Where("transaction_date >= ?", *startDate)
 	}
@@ -66,13 +76,33 @@ func (r *transactionRepository) FindByUserIDAndDateRange(userID uuid.UUID, limit
 	return transactions, nil
 }
 
+func (r *transactionRepository) FindByUserIDAndWallet(userID uuid.UUID, walletID uuid.UUID, limit, offset int) ([]*models.Transaction, error) {
+	var transactions []*models.Transaction
+	err := r.db.Where("user_id = ? AND wallet_id = ?", userID, walletID).
+		Order("transaction_date DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&transactions).Error
+	if err != nil {
+		return nil, err
+	}
+	return transactions, nil
+}
+
 func (r *transactionRepository) CountByUserID(userID uuid.UUID) (int64, error) {
 	return r.CountByUserIDAndDateRange(userID, nil, nil)
 }
 
 func (r *transactionRepository) CountByUserIDAndDateRange(userID uuid.UUID, startDate, endDate *time.Time) (int64, error) {
+	return r.CountByUserIDWalletAndDateRange(userID, nil, startDate, endDate)
+}
+
+func (r *transactionRepository) CountByUserIDWalletAndDateRange(userID uuid.UUID, walletID *uuid.UUID, startDate, endDate *time.Time) (int64, error) {
 	var count int64
 	query := r.db.Model(&models.Transaction{}).Where("user_id = ?", userID)
+	if walletID != nil {
+		query = query.Where("wallet_id = ?", *walletID)
+	}
 	if startDate != nil {
 		query = query.Where("transaction_date >= ?", *startDate)
 	}

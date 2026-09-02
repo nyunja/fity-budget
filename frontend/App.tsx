@@ -17,6 +17,7 @@ import { setCurrency } from './utils/currency';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { PeriodProvider } from './contexts/PeriodContext';
 import { NavigationProvider } from './contexts/NavigationContext';
+import { AccountFilterProvider } from './contexts/AccountFilterContext';
 import { User, ViewState } from './types';
 import { analyticsAPI, goalsAPI, authAPI } from './services/api';
 
@@ -250,7 +251,9 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <PeriodProvider>
-        <AppContent />
+        <AccountFilterProvider>
+          <AppContent />
+        </AccountFilterProvider>
       </PeriodProvider>
     </AuthProvider>
   );

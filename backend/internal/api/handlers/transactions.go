@@ -87,6 +87,16 @@ func (h *TransactionHandler) ListTransactions(c *gin.Context) {
 		EndDate:   parseQueryDate(c.Query("end_date"), true),
 	}
 
+	// Optional wallet filter
+	if walletIDStr := c.Query("wallet_id"); walletIDStr != "" {
+		parsed, err := uuid.Parse(walletIDStr)
+		if err != nil {
+			utils.Error(c, http.StatusBadRequest, "INVALID_WALLET_ID", "wallet_id must be a valid UUID")
+			return
+		}
+		filter.WalletID = &parsed
+	}
+
 	transactions, total, err := h.transactionService.GetUserTransactionsWithCount(userID, limit, offset, filter)
 	if err != nil {
 		utils.Error(c, http.StatusInternalServerError, "FETCH_FAILED", err.Error())
