@@ -52,6 +52,14 @@ const TransactionsPage: React.FC = () => {
     refetch
   );
 
+  // Submit wrapper: close the modal when the transaction was saved
+  const handleSubmitAndClose = async (e: React.FormEvent) => {
+    const ok = await handleSubmit(e);
+    if (ok) {
+      setIsModalOpen(false);
+    }
+  };
+
   // Handle delete
   const handleDelete = async (txId: string) => {
     if (!confirm('Are you sure you want to delete this transaction?')) {
@@ -137,7 +145,7 @@ const TransactionsPage: React.FC = () => {
         formData={formData}
         setters={setters}
         submitError={submitError}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmitAndClose}
         creating={creating}
       />
     </div>

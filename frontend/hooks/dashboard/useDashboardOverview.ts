@@ -11,7 +11,7 @@ interface GoalsResponse {
   goals: Array<{
     id: string;
     name: string;
-    target_amount: number;
+    target: number;
     current_amount: number;
     color: string;
     icon?: string;
@@ -44,11 +44,11 @@ export const useDashboardOverview = () => {
     } as Transaction;
   });
 
-  // Transform goals data: backend returns target_amount/current_amount, frontend expects target/current
+  // Transform goals data: backend returns target/current_amount, frontend expects target/current
   const goals: SavingGoal[] = goalsData?.goals?.map(goal => ({
     id: goal.id,
     name: goal.name,
-    target: goal.target_amount,
+    target: goal.target,
     current: goal.current_amount,
     color: goal.color,
     icon: goal.icon,

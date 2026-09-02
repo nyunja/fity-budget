@@ -24,19 +24,19 @@ export const useTransactionForm = (
     }
   }, [wallets, newTxWallet]);
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (e: React.FormEvent): Promise<boolean> => {
     e.preventDefault();
     setSubmitError(null);
 
     const amount = parseFloat(newTxAmount);
     if (isNaN(amount) || amount <= 0) {
       setSubmitError('Please enter a valid amount');
-      return;
+      return false;
     }
 
     if (!newTxWallet) {
       setSubmitError('Please select a wallet');
-      return;
+      return false;
     }
 
     const result = await createTransaction({
@@ -53,8 +53,10 @@ export const useTransactionForm = (
     if (result.success) {
       refetch(); // Refresh the transaction list
       resetForm();
+      return true;
     } else {
       setSubmitError(result.error || 'Failed to create transaction');
+      return false;
     }
   };
 
