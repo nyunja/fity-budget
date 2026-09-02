@@ -20,29 +20,17 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center md:items-stretch gap-4 flex-1 min-h-0">
-        <div className="flex-1 space-y-3 w-full pr-0 md:pr-4 max-h-28 md:max-h-none overflow-y-auto">
-          {data.length > 0 ? (
-            data.map((item, index) => (
-               <div key={index} className="flex items-center gap-2 text-sm">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></span>
-                  <span className="text-gray-600 dark:text-gray-300 flex-1">{item.name}</span>
-               </div>
-            ))
-          ) : (
-            <p className="text-sm text-gray-400">No budget data set.</p>
-          )}
-        </div>
-        
-        <div className="relative w-[140px] h-[140px] md:w-[200px] md:h-[200px] xl:w-[240px] xl:h-[240px] flex-shrink-0">
+      {data.length > 0 ? (
+        <div className="flex flex-1 items-center justify-center min-h-[200px]">
+          <div className="relative w-[200px] h-[200px] md:w-full md:max-w-[280px] xl:max-w-[320px] md:h-auto md:aspect-square">
             <ResponsiveContainer width="100%" height="100%">
             <PieChart>
                 <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius="50%"
-                outerRadius="85%"
+                innerRadius="73%"
+                outerRadius="95%"
                 paddingAngle={5}
                 dataKey="value"
                 stroke="none"
@@ -51,7 +39,10 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
                     <Cell key={`cell-${index}`} fill={entry.color} cornerRadius={40} />
                 ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
+                  allowEscapeViewBox={{ x: false, y: false }}
+                  offset={12}
+                  wrapperStyle={{ pointerEvents: 'none', zIndex: 10 }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'var(--tooltip-bg, #fff)' }}
                 />
             </PieChart>
@@ -62,14 +53,17 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
                 <span className="text-xl font-bold text-gray-900 dark:text-white">{cur()}{total.toLocaleString()}</span>
             </div>
              {/* Floating Label Simulation (like image) */}
-             {data.length > 0 && (
-               <div className="absolute top-0 left-0 bg-white dark:bg-gray-700 p-2 rounded-xl shadow-md border border-gray-100 dark:border-gray-600 text-xs hidden sm:block transform -translate-x-2 -translate-y-2">
-                  <p className="text-gray-400 dark:text-gray-300">{(data[0].value / total * 100).toFixed(0)}%</p>
-                  <p className="font-bold text-gray-900 dark:text-white">{cur()}{data[0].value}</p>
-               </div>
-             )}
+             <div className="absolute top-0 left-0 bg-white dark:bg-gray-700 p-2 rounded-xl shadow-md border border-gray-100 dark:border-gray-600 text-xs hidden sm:block transform -translate-x-2 -translate-y-2">
+                <p className="text-gray-400 dark:text-gray-300">{(data[0].value / total * 100).toFixed(0)}%</p>
+                <p className="font-bold text-gray-900 dark:text-white">{cur()}{data[0].value}</p>
+             </div>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-sm text-gray-400">No budget data set.</p>
+        </div>
+      )}
     </div>
   );
 };

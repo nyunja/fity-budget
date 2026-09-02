@@ -24,28 +24,22 @@ const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insig
 
   return (
     <div className="flex flex-col gap-5 md:gap-6">
-      {/* Mobile Top Bar: Menu + App Name */}
-      {onMenuClick && (
-        <div className="flex items-center gap-3 lg:hidden">
-          <button
-            onClick={onMenuClick}
-            className="shrink-0 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 shadow-sm"
-            aria-label="Open navigation menu"
-          >
-            <Menu size={20} />
-          </button>
-          <span className="font-bold text-xl tracking-tight text-gray-900 dark:text-white">FityBudget</span>
-        </div>
-      )}
+      {/* Top Bar: Menu + App Name (mobile) | Search / Alerts / Profile */}
+      <div className="flex items-center justify-between gap-3">
+        {onMenuClick && (
+          <div className="flex items-center gap-3 lg:hidden">
+            <button
+              onClick={onMenuClick}
+              className="shrink-0 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 shadow-sm"
+              aria-label="Open navigation menu"
+            >
+              <Menu size={20} />
+            </button>
+            <span className="font-bold text-xl tracking-tight text-gray-900 dark:text-white">FityBudget</span>
+          </div>
+        )}
 
-      {/* Top Row: Welcome & Profile */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user.name}!</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">It is the best time to manage your finances</p>
-        </div>
-
-        <div className="flex items-center gap-4 self-end md:self-auto">
+        <div className="flex items-center gap-4 ml-auto self-end md:self-auto">
           <button className="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
             <Search size={20} />
           </button>
@@ -80,43 +74,40 @@ const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insig
         </div>
       )}
 
-      {/* Second Row: Controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        {showPeriodFilter && (
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm w-full sm:w-auto transition-colors">
-            {PERIOD_OPTIONS.map(({ label, value }) => (
-              <button
-                key={value}
-                onClick={() => setPeriod(value)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  period === value
-                    ? 'bg-gray-900 dark:bg-gray-700 text-white shadow-md'
-                    : 'bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
+      {/* Greeting & Controls */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user.name}!</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">It is the best time to manage your finances</p>
+        </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button 
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+          {showPeriodFilter && (
+            <div className="flex items-center gap-2 bg-white dark:bg-gray-800 px-2 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm w-full md:w-auto transition-colors">
+              {PERIOD_OPTIONS.map(({ label, value }) => (
+                <button
+                  key={value}
+                  onClick={() => setPeriod(value)}
+                  className={`flex-1 md:flex-none px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    period === value
+                      ? 'bg-gray-900 dark:bg-gray-700 text-white shadow-md'
+                      : 'bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <button
             onClick={onGenerateInsights}
             disabled={isGenerating}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors disabled:opacity-50"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors disabled:opacity-50"
           >
             {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} />}
             <span>Ask AI</span>
           </button>
-          {/* <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-            <Grid size={18} />
-            <span>Manage widgets</span>
-          </button>
-          <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 text-white font-medium hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors">
-            <Plus size={18} />
-            <span>Add new widget</span>
-          </button> */}
         </div>
       </div>
     </div>

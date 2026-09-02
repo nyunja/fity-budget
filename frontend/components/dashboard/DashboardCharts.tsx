@@ -14,7 +14,7 @@ const DashboardCharts: React.FC<DashboardChartsProps> = ({ moneyFlow, budget }) 
       <div className="xl:col-span-2 h-[400px]">
         <MoneyFlowChart data={moneyFlow} />
       </div>
-      <div className="xl:col-span-1 h-[400px]">
+      <div className="xl:col-span-1 h-auto xl:h-[400px]">
         <BudgetChart data={budget} />
       </div>
     </div>
