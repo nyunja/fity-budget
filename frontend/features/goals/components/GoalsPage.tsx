@@ -20,6 +20,7 @@ import { useGoals } from '../hooks/useGoals';
 import { useGoalMutations } from '../hooks/useGoalMutations';
 import { useGoalForm } from '../hooks/useGoalForm';
 import { useGoalMetrics } from '../hooks/useGoalMetrics';
+import { cur } from '../../../utils/currency';
 
 const GoalsPage: React.FC = () => {
   // Fetch goals from API
@@ -383,7 +384,7 @@ const GoalsPage: React.FC = () => {
                       <div>
                         <h4 className="font-bold text-indigo-900 dark:text-indigo-100 mb-1">Smart Insight</h4>
                         <p className="text-sm text-indigo-800 dark:text-indigo-200 leading-relaxed">
-                           To reach your goal by <span className="font-semibold">{selectedGoal.deadline ? new Date(selectedGoal.deadline).toLocaleDateString() : 'your deadline'}</span>, you should aim to save approximately <span className="font-bold text-lg">${Math.max(0, calculateMonthlySavings(selectedGoal)).toFixed(0)}</span> per month.
+                           To reach your goal by <span className="font-semibold">{selectedGoal.deadline ? new Date(selectedGoal.deadline).toLocaleDateString() : 'your deadline'}</span>, you should aim to save approximately <span className="font-bold text-lg">{cur()}{Math.max(0, calculateMonthlySavings(selectedGoal)).toFixed(0)}</span> per month.
                         </p>
                       </div>
                   </div>
@@ -398,14 +399,14 @@ const GoalsPage: React.FC = () => {
                         disabled={selectedGoal.status === 'Completed' || updating}
                         className="flex-1 py-3 border border-gray-200 dark:border-gray-700 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                       >
-                         {updating ? 'Updating...' : '+ Add $100'}
+                         {updating ? 'Updating...' : `+ Add ${cur()}100`}
                        </button>
                        <button
                         onClick={() => handleAddAmount(selectedGoal.id, 500)}
                         disabled={selectedGoal.status === 'Completed' || updating}
                         className="flex-1 py-3 border border-gray-200 dark:border-gray-700 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                       >
-                         {updating ? 'Updating...' : '+ Add $500'}
+                         {updating ? 'Updating...' : `+ Add ${cur()}500`}
                        </button>
                     </div>
                  </div>

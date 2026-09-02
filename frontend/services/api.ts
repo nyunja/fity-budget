@@ -390,7 +390,7 @@ export const analyticsAPI = {
   },
 
   getInsights: async () => {
-    return apiRequest('/analytics/insights', {
+    return apiRequest<{ insight: string; generated_at: string }>('/analytics/insights', {
       method: 'GET',
     });
   },

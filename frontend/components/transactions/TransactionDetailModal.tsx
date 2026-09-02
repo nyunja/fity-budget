@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Calendar, Tag, Wallet, CreditCard, FileText, Edit2, Trash2 } from 'lucide-react';
 import { Transaction } from '../../types';
 import { getTransactionIcon } from '../../utils/transactionUtils';
+import { cur } from '../../utils/currency';
 
 interface TransactionDetailModalProps {
   transaction: Transaction;
@@ -31,7 +32,7 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
             {getTransactionIcon(transaction.name)}
           </div>
           <h2 className={`text-3xl font-bold mb-1 ${transaction.amount > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
-            {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
+            {transaction.amount > 0 ? '+' : ''}{cur()}{Math.abs(transaction.amount).toLocaleString()}
           </h2>
           <p className="text-gray-500 dark:text-gray-400 font-medium">{transaction.name}</p>
           <span className="mt-2 text-xs font-bold px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 uppercase tracking-wide">

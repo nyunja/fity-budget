@@ -2,6 +2,7 @@ import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { Transaction } from '../../types';
 import { getTransactionIcon } from '../../utils/transactionUtils';
+import { cur } from '../../utils/currency';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -29,7 +30,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, o
       <div className="flex items-center gap-4">
         <div className="text-right">
           <p className={`font-bold text-sm md:text-base ${transaction.amount > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
-            {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()}
+            {transaction.amount > 0 ? '+' : ''}{cur()}{Math.abs(transaction.amount).toLocaleString()}
           </p>
           <p className="text-xs text-gray-400">{transaction.date.split(' ')[2]}</p>
         </div>

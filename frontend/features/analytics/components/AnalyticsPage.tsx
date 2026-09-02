@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useAnalyticsData, useFinancialMetrics, useHealthScore, useCategoryData, useRecurringExpenses } from '../hooks/useAnalytics';
 import { OverviewMetrics } from './OverviewMetrics';
+import { cur } from '../../../utils/currency';
 
 const AnalyticsPage: React.FC = () => {
    // Fetch and process data using custom hooks
@@ -158,7 +159,7 @@ const AnalyticsPage: React.FC = () => {
                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
                            <span className="text-gray-600 dark:text-gray-300">{item.name}</span>
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-white">${item.value.toLocaleString()}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{cur()}{item.value.toLocaleString()}</span>
                      </div>
                   ))}
                </div>
@@ -188,7 +189,7 @@ const AnalyticsPage: React.FC = () => {
                            </div>
                            <span className="font-medium text-gray-900 dark:text-white">{item.name}</span>
                         </div>
-                        <span className="font-bold text-gray-900 dark:text-white">${item.amount}</span>
+                        <span className="font-bold text-gray-900 dark:text-white">{cur()}{item.amount}</span>
                      </div>
                   )) : (
                      <p className="text-sm text-gray-400 text-center py-4">No recurring expenses detected.</p>
@@ -212,7 +213,7 @@ const AnalyticsPage: React.FC = () => {
                   <div>
                      <p className="text-gray-300 text-sm mb-1">Projected Spending</p>
                      <div className="flex items-end gap-2">
-                        <span className="text-3xl font-bold">${(totalExpense * 1.05).toFixed(0)}</span>
+                        <span className="text-3xl font-bold">{cur()}{(totalExpense * 1.05).toFixed(0)}</span>
                         <span className="text-sm text-red-300 mb-1">by month end</span>
                      </div>
                      <div className="w-full h-1.5 bg-gray-700 rounded-full mt-3 overflow-hidden">

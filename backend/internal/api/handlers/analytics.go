@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -218,7 +221,7 @@ func (h *AnalyticsHandler) GetSpendingAnalysis(c *gin.Context) {
 
 // GetInsights godoc
 // @Summary Get financial insights
-// @Description Get AI-generated financial insights and recommendations
+// @Description Get AI-generated financial insights and recommendations (via OpenRouter)
 // @Tags analytics
 // @Accept json
 // @Produce json
@@ -241,7 +244,49 @@ func (h *AnalyticsHandler) GetInsights(c *gin.Context) {
 		return
 	}
 
-	// Generate insight message based on health score
+	// Build the AI insight from a current-month dashboard summary
+	insightMessage := buildFallbackInsight(healthScore)
+
+	now := time.Now()
+	monthStart := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	monthEnd := monthStart.AddDate(0, 1, 0)
+
+	if summary, err := h.analyticsService.GetDashboardSummary(userID, monthStart, monthEnd); err == nil {
+		prompt := fmt.Sprintf(
+			"Analyze this financial dashboard data and provide a concise (max 3 sentences) insight or tip for the user. "+
+				"Focus on saving opportunities or praising progress. All amounts are in the user's local currency.\n"+
+				"Stats: total_balance=%.2f, total_income=%.2f, total_expense=%.2f, net_savings=%.2f, active_goals=%d, budget_alerts=%d\n"+
+				"Top spending categories: %s",
+			summary.TotalBalance, summary.TotalIncome, summary.TotalExpense, summary.NetSavings,
+			summary.ActiveGoalsCount, summary.BudgetAlerts, formatTopCategories(summary.TopCategories),
+		)
+
+		if aiInsight, err := services.GenerateFinancialInsight(prompt); err == nil {
+			insightMessage = aiInsight
+		} else {
+			log.Printf("[insights] AI generation skipped: %v", err)
+		}
+	}
+
+	utils.Success(c, http.StatusOK, gin.H{
+		"insight":      insightMessage,
+		"generated_at": time.Now(),
+		"health_score": healthScore,
+	})
+}
+
+func formatTopCategories(categories []*services.CategorySpending) string {
+	if len(categories) > 3 {
+		categories = categories[:3]
+	}
+	parts := make([]string, 0, len(categories))
+	for _, cat := range categories {
+		parts = append(parts, fmt.Sprintf("%s (%.2f)", cat.Category, cat.Amount))
+	}
+	return strings.Join(parts, ", ")
+}
+
+func buildFallbackInsight(healthScore *services.FinancialHealthScore) string {
 	var insightMessage string
 	if healthScore.Score >= 80 {
 		insightMessage = "Excellent job! Your finances are in great shape. Keep up the good work with budgeting and saving."
@@ -253,16 +298,10 @@ func (h *AnalyticsHandler) GetInsights(c *gin.Context) {
 		insightMessage = "Your financial health needs significant improvement. Start by implementing the recommendations below."
 	}
 
-	// Add specific insights based on metrics
 	if len(healthScore.Recommendations) > 0 {
 		insightMessage += " " + healthScore.Recommendations[0]
 	}
-
-	utils.Success(c, http.StatusOK, gin.H{
-		"insight":      insightMessage,
-		"generated_at": time.Now(),
-		"health_score": healthScore,
-	})
+	return insightMessage
 }
 
 // GetTrends godoc

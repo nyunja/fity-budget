@@ -13,17 +13,15 @@ import { SettingsPage } from './features/settings';
 import WalletPage from './components/WalletPage';
 import { HelpPage } from './features/help';
 
-import { getFinancialInsights } from './services/geminiService';
+import { setCurrency } from './utils/currency';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { PeriodProvider, usePeriod } from './contexts/PeriodContext';
-import { User, StatMetric, Transaction, SavingGoal, MoneyFlowData, BudgetCategory, ViewState, Budget, WalletAccount } from './types';
-import { useAPI } from './hooks/useAPI';
-import { analyticsAPI, transactionsAPI, goalsAPI, budgetsAPI, walletsAPI, authAPI } from './services/api';
+import { PeriodProvider } from './contexts/PeriodContext';
+import { User, ViewState } from './types';
+import { analyticsAPI, goalsAPI, authAPI } from './services/api';
 
 // Main App Content Component
 const AppContent: React.FC = () => {
   const { user, isAuthenticated, login, logout, register } = useAuth();
-  const { startDate, endDate } = usePeriod();
 
   // App State
   const [view, setView] = useState<ViewState>('login');
@@ -31,26 +29,6 @@ const AppContent: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-
-  // Fetch data for insights generation (Header component)
-  const { data: dashboardData } = useAPI<{ stats: StatMetric[] }>(
-    () => analyticsAPI.getDashboard({ start_date: startDate, end_date: endDate }),
-    { auto: isAuthenticated, deps: [isAuthenticated, startDate, endDate] }
-  );
-
-  const { data: recentTransactions } = useAPI<{ transactions: Transaction[] }>(
-    () => transactionsAPI.list({ limit: 5, start_date: startDate, end_date: endDate }),
-    { auto: isAuthenticated, deps: [isAuthenticated, startDate, endDate] }
-  );
-
-  const { data: goalsData } = useAPI<{ goals: SavingGoal[] }>(
-    () => goalsAPI.list(),
-    { auto: isAuthenticated }
-  );
-
-  const stats = dashboardData?.stats || [];
-  const transactions = recentTransactions?.transactions || [];
-  const goals = goalsData?.goals || [];
 
   // Effect to redirect based on auth status
   useEffect(() => {
@@ -69,6 +47,11 @@ const AppContent: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  // Currency display follows the user's profile setting
+  useEffect(() => {
+    setCurrency(user?.currency);
+  }, [user?.currency]);
 
   // -- Handlers --
 
@@ -139,8 +122,12 @@ const AppContent: React.FC = () => {
     setIsGenerating(true);
     setInsight(null);
     try {
-      const result = await getFinancialInsights(stats, transactions, goals);
-      setInsight(result);
+      const result = await analyticsAPI.getInsights();
+      if (result.success && result.data?.insight) {
+        setInsight(result.data.insight);
+      } else {
+        setInsight(result.error?.message || "Unable to retrieve insights.");
+      }
     } catch (error) {
       setInsight("Unable to retrieve insights.");
     } finally {

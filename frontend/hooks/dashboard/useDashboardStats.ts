@@ -30,31 +30,27 @@ export const useDashboardStats = () => {
         {
           label: 'Total balance',
           value: dashboardData.dashboard.total_balance,
-          trend: dashboardData.dashboard.month_comparison?.income_change || 0,
+          trend: Math.round((dashboardData.dashboard.month_comparison?.income_change || 0) * 10) / 10,
           trendDirection: (dashboardData.dashboard.month_comparison?.income_change || 0) >= 0 ? 'up' : 'down',
-          prefix: '$',
-        },
+                  },
         {
           label: 'Income',
           value: dashboardData.dashboard.total_income,
-          trend: dashboardData.dashboard.month_comparison?.income_change || 0,
+          trend: Math.round((dashboardData.dashboard.month_comparison?.income_change || 0) * 10) / 10,
           trendDirection: (dashboardData.dashboard.month_comparison?.income_change || 0) >= 0 ? 'up' : 'down',
-          prefix: '$',
-        },
+                  },
         {
           label: 'Expense',
           value: dashboardData.dashboard.total_expense,
-          trend: dashboardData.dashboard.month_comparison?.expense_change || 0,
+          trend: Math.round((dashboardData.dashboard.month_comparison?.expense_change || 0) * 10) / 10,
           trendDirection: (dashboardData.dashboard.month_comparison?.expense_change || 0) >= 0 ? 'up' : 'down',
-          prefix: '$',
-        },
+                  },
         {
           label: 'Total savings',
           value: dashboardData.dashboard.net_savings,
           trend: 0,
           trendDirection: 'up',
-          prefix: '$',
-        },
+                  },
       ]
     : [
         { label: 'Total balance', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },

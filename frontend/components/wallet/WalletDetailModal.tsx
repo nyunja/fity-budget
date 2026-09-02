@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Edit2, Trash2, ArrowDownLeft, ArrowUpRight, MoreHorizontal, Loader2 } from 'lucide-react';
 import { WalletAccount, Transaction } from '../../types';
+import { cur } from '../../utils/currency';
 
 interface WalletDetailModalProps {
   wallet: WalletAccount;
@@ -106,7 +107,7 @@ const WalletDetailModal: React.FC<WalletDetailModalProps> = ({
                     </div>
                   </div>
                   <span className={`font-bold ${tx.amount > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
-                    {tx.amount > 0 ? '+' : ''}${Math.abs(tx.amount).toLocaleString()}
+                    {tx.amount > 0 ? '+' : ''}{cur()}{Math.abs(tx.amount).toLocaleString()}
                   </span>
                 </div>
               ))

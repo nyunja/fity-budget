@@ -1,8 +1,9 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { StatMetric } from '../types';
+import { cur } from '../utils/currency';
 
-const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection, prefix }) => {
+const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection }) => {
   const isPositive = trendDirection === 'up';
 
   return (
@@ -16,7 +17,7 @@ const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection, p
       
       <div className="space-y-3">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {prefix}{value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          {cur()}{value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </h2>
         
         <div className="flex items-center gap-2">
@@ -26,7 +27,7 @@ const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection, p
               : 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400'
           }`}>
             {isPositive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-            {trend}%
+            {Math.round(trend * 10) / 10}%
           </div>
           <span className="text-xs text-gray-400">vs last month</span>
         </div>

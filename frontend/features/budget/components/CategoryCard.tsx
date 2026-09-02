@@ -1,6 +1,7 @@
 import React from 'react';
 import { Trash2, Lock, Unlock, AlertTriangle, ChevronDown, PieChart as PieChartIcon, Loader2 } from 'lucide-react';
 import { BudgetAnalysis } from '../hooks/useBudgetAnalysis';
+import { cur } from '../../../utils/currency';
 
 const CategoryCard: React.FC<{
   item: BudgetAnalysis;
@@ -51,7 +52,7 @@ const CategoryCard: React.FC<{
         <div>
           <div className="flex justify-between text-sm mb-2 font-medium">
             <span className={`${item.isOverspent ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
-              ${item.spent.toLocaleString()}
+              {cur()}{item.spent.toLocaleString()}
             </span>
             <span className="text-gray-500 dark:text-gray-400">/ ${item.limit.toLocaleString()}</span>
           </div>
@@ -67,7 +68,7 @@ const CategoryCard: React.FC<{
           {item.isOverspent ? (
             <div className="flex items-center gap-1.5 text-red-600 dark:text-red-400 font-medium">
               <AlertTriangle size={14} />
-              <span>Overspent by ${Math.abs(item.remaining).toLocaleString()}</span>
+              <span>Overspent by {cur()}{Math.abs(item.remaining).toLocaleString()}</span>
             </div>
           ) : (
             <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">

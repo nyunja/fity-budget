@@ -2,6 +2,7 @@ import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { BudgetCategory } from '../types';
 import { ArrowUpRight } from 'lucide-react';
+import { cur } from '../utils/currency';
 
 interface BudgetChartProps {
   data: BudgetCategory[];
@@ -58,7 +59,7 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
             {/* Center Text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <span className="text-xs text-gray-400 font-medium">Total for month</span>
-                <span className="text-xl font-bold text-gray-900 dark:text-white">${total.toLocaleString()}</span>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">{cur()}{total.toLocaleString()}</span>
             </div>
              {/* Floating Label Simulation (like image) */}
              {data.length > 0 && (

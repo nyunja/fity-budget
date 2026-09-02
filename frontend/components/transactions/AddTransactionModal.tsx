@@ -2,6 +2,7 @@ import React from 'react';
 import { X, AlertCircle } from 'lucide-react';
 import { WalletAccount } from '../../types';
 import { TRANSACTION_CATEGORIES } from '../../constants/transactionConstants';
+import { cur } from '../../utils/currency';
 
 interface AddTransactionModalProps {
   isOpen: boolean;
@@ -86,7 +87,7 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
 
           {/* Amount - Big Input */}
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">{cur()}</span>
             <input
               type="number"
               value={formData.amount}

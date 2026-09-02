@@ -1,4 +1,5 @@
 import React from 'react';
+import { cur } from '../../../utils/currency';
 
 export const MetricCard: React.FC<{
     title: string;
@@ -21,7 +22,7 @@ export const MetricCard: React.FC<{
           </div>
         </div>
         <div>
-          <h3 className="text-3xl font-bold text-gray-900 dark:text-white">${value.toLocaleString()}</h3>
+          <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{cur()}{value.toLocaleString()}</h3>
           <p className={`text-xs ${colorClasses[color].text} mt-1 font-medium`}>{trend}</p>
         </div>
       </div>

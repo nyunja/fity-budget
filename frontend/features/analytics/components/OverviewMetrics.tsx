@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Target } from 'lucide-react';
 import { MetricCard } from './MetricCard';
+import { cur } from '../../../utils/currency';
 
 interface OverviewMetricsProps {
     totalIncome: number;
@@ -39,7 +40,7 @@ export const OverviewMetrics: React.FC<OverviewMetricsProps> = ({
                     </div>
                 </div>
                 <div>
-                    <h3 className="text-3xl font-bold">${netSavings.toLocaleString()}</h3>
+                    <h3 className="text-3xl font-bold">{cur()}{netSavings.toLocaleString()}</h3>
                     <p className="text-xs text-indigo-100 mt-1 opacity-80">{savingsRate.toFixed(1)}% savings rate</p>
                 </div>
             </div>

@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser({
           name: response.data.user.name,
           email: response.data.user.email,
+          currency: response.data.user.currency,
         });
       } else {
         // Token invalid, clear it
@@ -62,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser({
           name: response.data.user.name,
           email: response.data.user.email,
+          currency: response.data.user.currency,
         });
         return { success: true };
       } else {
@@ -87,6 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser({
           name: response.data.user.name,
           email: response.data.user.email,
+          currency: response.data.user.currency,
         });
         return { success: true };
       } else {

@@ -65,6 +65,7 @@ export interface StatMetric {
 export interface User {
   name: string;
   email: string;
+  currency?: string;
 }
 
 export type WalletType = 'Mobile Money' | 'Bank' | 'Cash' | 'Credit' | 'Savings';
