@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Wallet } from 'lucide-react';
+import { Wallet, Menu } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/dashboard/Dashboard';
@@ -28,6 +28,7 @@ const AppContent: React.FC = () => {
   const [insight, setInsight] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   // Fetch data for insights generation (Header component)
   const { data: dashboardData } = useAPI<{ stats: StatMetric[] }>(
@@ -171,11 +172,21 @@ const AppContent: React.FC = () => {
         toggleTheme={() => setDarkMode(!darkMode)}
         currentView={view}
         onNavigate={setView}
+        isMobileOpen={isMobileNavOpen}
+        onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
       <div className="flex-1 lg:ml-64 relative">
         {/* Sticky Header Container with Blur */}
-        <div className="sticky top-0 z-10 bg-[#F8F9FD]/90 dark:bg-gray-900/90 backdrop-blur-md p-4 md:p-8 pb-4">
+        <div className="sticky top-0 z-10 relative bg-[#F8F9FD]/90 dark:bg-gray-900/90 backdrop-blur-md p-4 pl-16 md:p-8 md:pl-16 lg:pl-8 pb-4">
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsMobileNavOpen(true)}
+            className="lg:hidden absolute left-4 top-4 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 shadow-sm"
+            aria-label="Open navigation menu"
+          >
+            <Menu size={20} />
+          </button>
           {user && (
             <Header
               user={user}

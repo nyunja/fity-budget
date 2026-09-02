@@ -21,9 +21,11 @@ interface SidebarProps {
   toggleTheme: () => void;
   currentView: ViewState;
   onNavigate: (view: ViewState) => void;
+  isMobileOpen: boolean;
+  onCloseMobile: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onLogout, isDarkMode, toggleTheme, currentView, onNavigate }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onLogout, isDarkMode, toggleTheme, currentView, onNavigate, isMobileOpen, onCloseMobile }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', id: 'dashboard' as const },
     { icon: ArrowRightLeft, label: 'Transactions', id: 'transactions' as const },
@@ -34,8 +36,24 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isDarkMode, toggleTheme, cu
     { icon: Settings, label: 'Settings', id: 'settings' as const }, 
   ];
 
+  const navigate = (view: ViewState) => {
+    onNavigate(view);
+    onCloseMobile();
+  };
+
   return (
-    <div className="hidden lg:flex w-64 h-screen bg-white dark:bg-gray-800 flex-col border-r border-gray-100 dark:border-gray-700 fixed left-0 top-0 z-20 overflow-y-auto transition-colors duration-200">
+    <>
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      <div className={`fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-800 flex-col border-r border-gray-100 dark:border-gray-700 z-40 overflow-y-auto transition-transform duration-200 lg:translate-x-0 ${
+        isMobileOpen ? 'flex translate-x-0' : 'hidden -translate-x-full lg:flex'
+      }`}>
       {/* Logo */}
       <div className="p-8 flex items-center gap-3">
         <div className="w-8 h-8 bg-black dark:bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xl">F</div>
@@ -52,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isDarkMode, toggleTheme, cu
               onClick={() => {
                 // Navigate if view is supported
                 if (['dashboard', 'transactions', 'goals', 'budget', 'settings', 'analytics', 'wallet'].includes(item.id)) {
-                  onNavigate(item.id as ViewState);
+                  navigate(item.id as ViewState);
                 }
               }}
               className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-colors duration-200 ${
@@ -71,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isDarkMode, toggleTheme, cu
       {/* Bottom Actions */}
       <div className="p-4 space-y-2 mt-auto">
         <button 
-          onClick={() => onNavigate('help')}
+          onClick={() => navigate('help')}
           className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl transition-colors duration-200 ${
             currentView === 'help' 
               ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none' 
@@ -92,20 +110,21 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, isDarkMode, toggleTheme, cu
         {/* Theme Toggle */}
         <div className="bg-gray-100 dark:bg-gray-700 p-1 rounded-full flex items-center justify-between w-20 mx-4 mb-4 transition-colors">
           <button 
-            onClick={() => !isDarkMode && toggleTheme()}
+            onClick={() => isDarkMode && toggleTheme()}
             className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${!isDarkMode ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-400'}`}
           >
             <Sun size={14} />
           </button>
           <button 
-            onClick={() => isDarkMode && toggleTheme()}
+            onClick={() => !isDarkMode && toggleTheme()}
             className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${isDarkMode ? 'bg-gray-600 text-white shadow-sm' : 'text-gray-400'}`}
           >
             <Moon size={14} />
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
