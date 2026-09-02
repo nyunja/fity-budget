@@ -20,8 +20,8 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
         </button>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center flex-1">
-        <div className="flex-1 space-y-3 w-full pr-0 md:pr-4">
+      <div className="flex flex-col md:flex-row items-center md:items-stretch gap-4 flex-1 min-h-0">
+        <div className="flex-1 space-y-3 w-full pr-0 md:pr-4 max-h-28 md:max-h-none overflow-y-auto">
           {data.length > 0 ? (
             data.map((item, index) => (
                <div key={index} className="flex items-center gap-2 text-sm">
@@ -34,15 +34,15 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
           )}
         </div>
         
-        <div className="relative w-[180px] h-[180px] mt-4 md:mt-0 flex-shrink-0">
+        <div className="relative w-[140px] h-[140px] md:w-[180px] md:h-[180px] flex-shrink-0">
             <ResponsiveContainer width="100%" height="100%">
             <PieChart>
                 <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={80}
+                innerRadius={50}
+                outerRadius={65}
                 paddingAngle={5}
                 dataKey="value"
                 stroke="none"
@@ -65,7 +65,7 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
              {data.length > 0 && (
                <div className="absolute top-0 left-0 bg-white dark:bg-gray-700 p-2 rounded-xl shadow-md border border-gray-100 dark:border-gray-600 text-xs hidden sm:block transform -translate-x-2 -translate-y-2">
                   <p className="text-gray-400 dark:text-gray-300">{(data[0].value / total * 100).toFixed(0)}%</p>
-                  <p className="font-bold text-gray-900 dark:text-white">${data[0].value}</p>
+                  <p className="font-bold text-gray-900 dark:text-white">{cur()}{data[0].value}</p>
                </div>
              )}
         </div>
