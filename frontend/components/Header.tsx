@@ -23,23 +23,26 @@ const Header: React.FC<HeaderProps> = ({ onGenerateInsights, isGenerating, insig
   const { period, setPeriod } = usePeriod();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5 md:gap-6">
+      {/* Mobile Top Bar: Menu + App Name */}
+      {onMenuClick && (
+        <div className="flex items-center gap-3 lg:hidden">
+          <button
+            onClick={onMenuClick}
+            className="shrink-0 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 shadow-sm"
+            aria-label="Open navigation menu"
+          >
+            <Menu size={20} />
+          </button>
+          <span className="font-bold text-xl tracking-tight text-gray-900 dark:text-white">FityBudget</span>
+        </div>
+      )}
+
       {/* Top Row: Welcome & Profile */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex items-start gap-3 min-w-0">
-          {onMenuClick && (
-            <button
-              onClick={onMenuClick}
-              className="lg:hidden shrink-0 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 shadow-sm"
-              aria-label="Open navigation menu"
-            >
-              <Menu size={20} />
-            </button>
-          )}
-          <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user.name}!</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">It is the best time to manage your finances</p>
-          </div>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, {user.name}!</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">It is the best time to manage your finances</p>
         </div>
 
         <div className="flex items-center gap-4 self-end md:self-auto">

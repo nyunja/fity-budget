@@ -34,15 +34,15 @@ const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
           )}
         </div>
         
-        <div className="relative w-[140px] h-[140px] md:w-[180px] md:h-[180px] flex-shrink-0">
+        <div className="relative w-[140px] h-[140px] md:w-[200px] md:h-[200px] xl:w-[240px] xl:h-[240px] flex-shrink-0">
             <ResponsiveContainer width="100%" height="100%">
             <PieChart>
                 <Pie
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={50}
-                outerRadius={65}
+                innerRadius="50%"
+                outerRadius="85%"
                 paddingAngle={5}
                 dataKey="value"
                 stroke="none"

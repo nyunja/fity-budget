@@ -126,15 +126,15 @@ const AnalyticsPage: React.FC = () => {
             {/* Spending Distribution (Pie) */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
                <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">Spending Breakdown</h3>
-               <div className="h-48 w-full relative">
+               <div className="h-48 md:h-64 xl:h-80 w-full relative">
                   <ResponsiveContainer width="100%" height="100%">
                      <PieChart>
                         <Pie
                            data={categoryData}
                            cx="50%"
                            cy="50%"
-                           innerRadius={60}
-                           outerRadius={80}
+                           innerRadius="50%"
+                           outerRadius="85%"
                            paddingAngle={5}
                            dataKey="value"
                            stroke="none"
