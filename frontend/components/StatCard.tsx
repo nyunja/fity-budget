@@ -1,18 +1,24 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { StatMetric } from '../types';
+import { useNavigation } from '../contexts/NavigationContext';
 import { cur } from '../utils/currency';
 
-const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection }) => {
+const StatCard: React.FC<StatMetric> = ({ label, value, trend, trendDirection, navigateTo }) => {
   const isPositive = trendDirection === 'up';
+  const { navigate } = useNavigation();
 
   return (
     <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-gray-500 dark:text-gray-400 font-medium text-sm">{label}</h3>
-        <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors cursor-pointer">
+        <button
+          onClick={() => navigateTo && navigate(navigateTo)}
+          aria-label={`View ${label}`}
+          className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors cursor-pointer"
+        >
           <ArrowUpRight size={16} />
-        </div>
+        </button>
       </div>
       
       <div className="space-y-3">

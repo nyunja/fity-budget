@@ -32,31 +32,35 @@ export const useDashboardStats = () => {
           value: dashboardData.dashboard.total_balance,
           trend: Math.round((dashboardData.dashboard.month_comparison?.income_change || 0) * 10) / 10,
           trendDirection: (dashboardData.dashboard.month_comparison?.income_change || 0) >= 0 ? 'up' : 'down',
-                  },
+          navigateTo: 'wallet',
+        },
         {
           label: 'Income',
           value: dashboardData.dashboard.total_income,
           trend: Math.round((dashboardData.dashboard.month_comparison?.income_change || 0) * 10) / 10,
           trendDirection: (dashboardData.dashboard.month_comparison?.income_change || 0) >= 0 ? 'up' : 'down',
-                  },
+          navigateTo: 'analytics',
+        },
         {
           label: 'Expense',
           value: dashboardData.dashboard.total_expense,
           trend: Math.round((dashboardData.dashboard.month_comparison?.expense_change || 0) * 10) / 10,
           trendDirection: (dashboardData.dashboard.month_comparison?.expense_change || 0) >= 0 ? 'up' : 'down',
-                  },
+          navigateTo: 'analytics',
+        },
         {
           label: 'Total savings',
           value: dashboardData.dashboard.net_savings,
           trend: 0,
           trendDirection: 'up',
-                  },
+          navigateTo: 'goals',
+        },
       ]
     : [
-        { label: 'Total balance', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
-        { label: 'Income', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
-        { label: 'Expense', value: 0, trend: 0, trendDirection: 'down', prefix: '$' },
-        { label: 'Total savings', value: 0, trend: 0, trendDirection: 'up', prefix: '$' },
+        { label: 'Total balance', value: 0, trend: 0, trendDirection: 'up', prefix: '$', navigateTo: 'wallet' },
+        { label: 'Income', value: 0, trend: 0, trendDirection: 'up', prefix: '$', navigateTo: 'analytics' },
+        { label: 'Expense', value: 0, trend: 0, trendDirection: 'down', prefix: '$', navigateTo: 'analytics' },
+        { label: 'Total savings', value: 0, trend: 0, trendDirection: 'up', prefix: '$', navigateTo: 'goals' },
       ];
 
   return { stats, loading, error };

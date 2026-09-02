@@ -2,6 +2,7 @@ import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { BudgetCategory } from '../types';
 import { ArrowUpRight } from 'lucide-react';
+import { useNavigation } from '../contexts/NavigationContext';
 import { cur } from '../utils/currency';
 
 interface BudgetChartProps {
@@ -9,13 +10,18 @@ interface BudgetChartProps {
 }
 
 const BudgetChart: React.FC<BudgetChartProps> = ({ data }) => {
+  const { navigate } = useNavigation();
   const total = data.reduce((acc, cur) => acc + cur.value, 0);
 
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm h-full flex flex-col transition-colors duration-200">
       <div className="flex justify-between items-start mb-2">
         <h3 className="font-bold text-lg text-gray-900 dark:text-white">Budget</h3>
-        <button className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors">
+        <button
+          onClick={() => navigate('budget')}
+          aria-label="Go to budget"
+          className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors"
+        >
           <ArrowUpRight size={16} />
         </button>
       </div>

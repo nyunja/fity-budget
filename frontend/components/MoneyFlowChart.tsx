@@ -1,17 +1,28 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { MoneyFlowData } from '../types';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ArrowUpRight } from 'lucide-react';
+import { useNavigation } from '../contexts/NavigationContext';
 
 interface MoneyFlowChartProps {
   data: MoneyFlowData[];
 }
 
 const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({ data }) => {
+  const { navigate } = useNavigation();
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm h-full transition-colors duration-200">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h3 className="font-bold text-lg text-gray-900 dark:text-white">Money flow</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="font-bold text-lg text-gray-900 dark:text-white">Money flow</h3>
+          <button
+            onClick={() => navigate('analytics')}
+            aria-label="Go to analytics"
+            className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors"
+          >
+            <ArrowUpRight size={16} />
+          </button>
+        </div>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-4 text-xs font-medium">
              <div className="flex items-center gap-2">
@@ -26,9 +37,6 @@ const MoneyFlowChart: React.FC<MoneyFlowChartProps> = ({ data }) => {
           <div className="flex gap-2">
               <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                 All accounts <ChevronDown size={12} />
-              </button>
-               <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                This year <ChevronDown size={12} />
               </button>
           </div>
         </div>

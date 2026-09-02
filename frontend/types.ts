@@ -60,6 +60,7 @@ export interface StatMetric {
   trend: number; // percentage
   trendDirection: 'up' | 'down';
   prefix?: string;
+  navigateTo?: ViewState;
 }
 
 export interface User {

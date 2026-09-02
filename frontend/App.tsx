@@ -16,6 +16,7 @@ import { HelpPage } from './features/help';
 import { setCurrency } from './utils/currency';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { PeriodProvider } from './contexts/PeriodContext';
+import { NavigationProvider } from './contexts/NavigationContext';
 import { User, ViewState } from './types';
 import { analyticsAPI, goalsAPI, authAPI } from './services/api';
 
@@ -163,7 +164,8 @@ const AppContent: React.FC = () => {
 
   // Main App Layout
   return (
-    <div className="flex bg-[#F8F9FD] dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    <NavigationProvider value={{ navigate: setView }}>
+      <div className="flex bg-[#F8F9FD] dark:bg-gray-900 min-h-screen font-sans text-gray-900 dark:text-gray-100 transition-colors duration-200">
       <Sidebar
         onLogout={handleLogout}
         isDarkMode={darkMode}
@@ -240,6 +242,7 @@ const AppContent: React.FC = () => {
         </div>
       </div>
     </div>
+    </NavigationProvider>
   );
 };
 

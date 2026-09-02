@@ -1,17 +1,23 @@
 import React from 'react';
 import { SavingGoal } from '../../../types';
 import { ArrowUpRight } from 'lucide-react';
+import { useNavigation } from '../../../contexts/NavigationContext';
 
 interface SavingGoalsProps {
   data: SavingGoal[];
 }
 
 const SavingGoals: React.FC<SavingGoalsProps> = ({ data }) => {
+  const { navigate } = useNavigation();
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm h-full transition-colors duration-200">
       <div className="flex justify-between items-start mb-6">
         <h3 className="font-bold text-lg text-gray-900 dark:text-white">Saving goals</h3>
-        <button className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors">
+        <button
+          onClick={() => navigate('goals')}
+          aria-label="Go to saving goals"
+          className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors"
+        >
           <ArrowUpRight size={16} />
         </button>
       </div>

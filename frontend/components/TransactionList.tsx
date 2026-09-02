@@ -1,12 +1,14 @@
 import React from 'react';
 import { Transaction } from '../types';
-import { Youtube, ShoppingBag, Coffee, ChevronDown, DollarSign } from 'lucide-react';
+import { Youtube, ShoppingBag, Coffee, ChevronDown, DollarSign, ArrowUpRight } from 'lucide-react';
+import { useNavigation } from '../contexts/NavigationContext';
 
 interface TransactionListProps {
   data: Transaction[];
 }
 
 const TransactionList: React.FC<TransactionListProps> = ({ data }) => {
+  const { navigate } = useNavigation();
   const getIcon = (name: string, category?: string) => {
     switch (category?.toLowerCase()) {
       case 'subscription': return <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center"><Youtube size={16} /></div>;
@@ -21,12 +23,16 @@ const TransactionList: React.FC<TransactionListProps> = ({ data }) => {
     <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm h-full transition-colors duration-200">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-bold text-lg text-gray-900 dark:text-white">Recent transactions</h3>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
             <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                 All accounts <ChevronDown size={12} />
             </button>
-            <button className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                See all <ChevronDown size={12} rotate={-90} />
+            <button
+              onClick={() => navigate('transactions')}
+              aria-label="See all transactions"
+              className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors"
+            >
+              <ArrowUpRight size={16} />
             </button>
         </div>
       </div>
