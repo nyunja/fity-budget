@@ -253,10 +253,7 @@ func (h *AnalyticsHandler) GetInsights(c *gin.Context) {
 
 	if summary, err := h.analyticsService.GetDashboardSummary(userID, monthStart, monthEnd); err == nil {
 		prompt := fmt.Sprintf(
-			"Analyze this financial dashboard data and provide a concise (max 3 sentences) insight or tip for the user. "+
-				"Focus on saving opportunities or praising progress. All amounts are in the user's local currency.\n"+
-				"Stats: total_balance=%.2f, total_income=%.2f, total_expense=%.2f, net_savings=%.2f, active_goals=%d, budget_alerts=%d\n"+
-				"Top spending categories: %s",
+			"Stats: total_balance=%.2f, total_income=%.2f, total_expense=%.2f, net_savings=%.2f, active_goals=%d, budget_alerts=%d\nTop spending categories: %s",
 			summary.TotalBalance, summary.TotalIncome, summary.TotalExpense, summary.NetSavings,
 			summary.ActiveGoalsCount, summary.BudgetAlerts, formatTopCategories(summary.TopCategories),
 		)
