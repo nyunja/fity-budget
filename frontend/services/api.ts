@@ -41,6 +41,12 @@ async function apiRequest<T>(
       headers,
     });
 
+    // DELETE endpoints respond 204 No Content with an empty body, which
+    // response.json() would reject. Treat it as a successful no-op.
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return { success: true } as APIResponse<T>;
+    }
+
     const data = await response.json();
     return data;
   } catch (error) {
