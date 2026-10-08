@@ -43,7 +43,14 @@ const BudgetPage: React.FC = () => {
     setIsFormOpen(false);
   };
 
-  const handleDeleted = () => refetchBudgets();
+  const handleDeleted = async (id: string) => {
+    const result = await deleteBudget(id);
+    if (result.success) {
+      refetchBudgets();
+    } else {
+      alert(result.error || 'Failed to delete budget');
+    }
+  };
 
   if (budgetsLoading || txLoading) {
     return (

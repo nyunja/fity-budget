@@ -4,7 +4,7 @@ import CategoryCard from './CategoryCard';
 
 const CategoryGrid: React.FC<{
   analysis: BudgetAnalysis[];
-  onDelete: () => void;
+  onDelete: (id: string) => void;
   deleting: boolean;
 }> = ({ analysis, onDelete, deleting }) => {
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -17,7 +17,7 @@ const CategoryGrid: React.FC<{
           item={item}
           isExpanded={expanded === item.category}
           onToggle={() => setExpanded(expanded === item.category ? null : item.category)}
-          onDelete={onDelete}
+          onDelete={() => onDelete(item.id)}
           deleting={deleting}
         />
       ))}
