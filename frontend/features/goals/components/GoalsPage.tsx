@@ -482,10 +482,9 @@ const GoalsPage: React.FC = () => {
 
                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Deadline</label>
+                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Deadline <span className="text-gray-400 font-normal">(optional)</span></label>
                        <input 
                          type="date"
-                         required
                          value={formData.deadline}
                          onChange={(e) => setters.setFormDeadline(e.target.value)}
                          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:border-indigo-500 outline-none"
