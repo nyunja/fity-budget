@@ -12,6 +12,7 @@ type MockAuthService struct {
 	GetUserByIDFunc        func(id uuid.UUID) (*models.User, error)
 	UpdateProfileFunc      func(id uuid.UUID, name, email, currency string) (*models.User, error)
 	ChangePasswordFunc     func(id uuid.UUID, currentPassword, newPassword string) error
+	DeleteAccountFunc      func(id uuid.UUID, password string) error
 	CompleteOnboardingFunc func(id uuid.UUID, monthlyIncome float64, currency string) error
 }
 
@@ -46,6 +47,13 @@ func (m *MockAuthService) UpdateProfile(id uuid.UUID, name, email, currency stri
 func (m *MockAuthService) ChangePassword(id uuid.UUID, currentPassword, newPassword string) error {
 	if m.ChangePasswordFunc != nil {
 		return m.ChangePasswordFunc(id, currentPassword, newPassword)
+	}
+	return nil
+}
+
+func (m *MockAuthService) DeleteAccount(id uuid.UUID, password string) error {
+	if m.DeleteAccountFunc != nil {
+		return m.DeleteAccountFunc(id, password)
 	}
 	return nil
 }

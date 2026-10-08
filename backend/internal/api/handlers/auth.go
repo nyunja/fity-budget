@@ -40,6 +40,10 @@ type ChangePasswordRequest struct {
 	NewPassword     string `json:"new_password" binding:"required,min=8"`
 }
 
+type DeleteAccountRequest struct {
+	Password string `json:"password" binding:"required"`
+}
+
 type OnboardingRequest struct {
 	MonthlyIncome  float64  `json:"monthly_income" binding:"required,min=0"`
 	Currency       string   `json:"currency" binding:"required,len=3"`
@@ -202,6 +206,41 @@ func (h *AuthHandler) ChangePassword(c *gin.Context) {
 
 	utils.Success(c, http.StatusOK, gin.H{
 		"message": "Password changed successfully",
+	})
+}
+
+// DeleteAccount godoc
+// @Summary Delete user account
+// @Description Permanently delete the authenticated user and all their data
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body DeleteAccountRequest true "Account deletion confirmation"
+// @Success 200 {object} utils.Response{data=object{message=string}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /auth/account [delete]
+func (h *AuthHandler) DeleteAccount(c *gin.Context) {
+	userID, err := middleware.GetUserID(c)
+	if err != nil {
+		utils.Error(c, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
+		return
+	}
+
+	var req DeleteAccountRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Error(c, http.StatusBadRequest, "VALIDATION_ERROR", err.Error())
+		return
+	}
+
+	if err := h.authService.DeleteAccount(userID, req.Password); err != nil {
+		utils.Error(c, http.StatusBadRequest, "DELETE_ACCOUNT_FAILED", err.Error())
+		return
+	}
+
+	utils.Success(c, http.StatusOK, gin.H{
+		"message": "Account deleted successfully",
 	})
 }
 
