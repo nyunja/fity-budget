@@ -7,6 +7,7 @@ export interface BudgetAnalysis extends Budget {
   progress: number;
   isOverspent: boolean;
   isWarning: boolean;
+  transactions: Transaction[];
 }
 
 export default function useBudgetAnalysis(budgets: Budget[], transactions: Transaction[]) {
@@ -26,7 +27,11 @@ export default function useBudgetAnalysis(budgets: Budget[], transactions: Trans
       const isOverspent = spent > budget.limit;
       const isWarning = !isOverspent && progress >= (budget.alertThreshold || 80);
 
-      return { ...budget, spent, remaining, progress, isOverspent, isWarning };
+      const categoryTransactions = transactions
+        .filter(t => t.category === budget.category && t.amount < 0)
+        .slice(0, 3);
+
+      return { ...budget, spent, remaining, progress, isOverspent, isWarning, transactions: categoryTransactions };
     });
   }, [budgets, transactions]);
 }

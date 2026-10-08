@@ -54,7 +54,7 @@ const CategoryCard: React.FC<{
             <span className={`${item.isOverspent ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
               {cur()}{item.spent.toLocaleString()}
             </span>
-            <span className="text-gray-500 dark:text-gray-400">/ ${item.limit.toLocaleString()}</span>
+            <span className="text-gray-500 dark:text-gray-400">/ {cur()}{item.limit.toLocaleString()}</span>
           </div>
           <div className="w-full h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
@@ -85,21 +85,18 @@ const CategoryCard: React.FC<{
         <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 animate-fade-in">
           <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3">Recent Transactions</h4>
           <div className="space-y-2">
-            {txs.length ? (
-              txs.slice(0, 3).map(t => (
+            {item.transactions.length ? (
+              item.transactions.map(t => (
                 <div key={t.id} className="flex justify-between items-center text-sm">
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">{t.name}</p>
                     <p className="text-xs text-gray-500">{t.date}</p>
                   </div>
-                  <span className="font-bold text-gray-900 dark:text-white">${Math.abs(t.amount)}</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{cur()}{Math.abs(t.amount).toLocaleString()}</span>
                 </div>
               ))
             ) : (
               <p className="text-xs text-gray-400 italic">No transactions this month.</p>
-            )}
-            {txs.length > 3 && (
-              <p className="text-center text-xs text-indigo-500 mt-2 font-medium">View all</p>
             )}
           </div>
         </div>
