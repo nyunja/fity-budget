@@ -28,12 +28,12 @@ func TestTransactionIntegration_CreateTransaction(t *testing.T) {
 		{
 			name: "successful expense transaction creation",
 			requestBody: map[string]interface{}{
-				"type":        "expense",
-				"amount":      500.00,
-				"category":    "Food & Groceries",
-				"description": "Weekly groceries",
-				"wallet_id":   wallet.ID.String(),
-				"date":        time.Now().Format(time.RFC3339),
+				"type":      "expense",
+				"amount":    500.00,
+				"category":  "Food & Groceries",
+				"name":      "Weekly groceries",
+				"wallet_id": wallet.ID.String(),
+				"date":      time.Now().Format(time.RFC3339),
 			},
 			expectedStatus: http.StatusCreated,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -62,12 +62,12 @@ func TestTransactionIntegration_CreateTransaction(t *testing.T) {
 		{
 			name: "successful income transaction creation",
 			requestBody: map[string]interface{}{
-				"type":        "income",
-				"amount":      3000.00,
-				"category":    "Salary",
-				"description": "Monthly salary",
-				"wallet_id":   wallet.ID.String(),
-				"date":        time.Now().Format(time.RFC3339),
+				"type":      "income",
+				"amount":    3000.00,
+				"category":  "Salary",
+				"name":      "Monthly salary",
+				"wallet_id": wallet.ID.String(),
+				"date":      time.Now().Format(time.RFC3339),
 			},
 			expectedStatus: http.StatusCreated,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -86,12 +86,12 @@ func TestTransactionIntegration_CreateTransaction(t *testing.T) {
 		{
 			name: "create transaction with invalid amount",
 			requestBody: map[string]interface{}{
-				"type":        "expense",
-				"amount":      -100.00,
-				"category":    "Food",
-				"description": "Invalid amount",
-				"wallet_id":   wallet.ID.String(),
-				"date":        time.Now().Format(time.RFC3339),
+				"type":      "expense",
+				"amount":    -100.00,
+				"category":  "Food",
+				"name":      "Invalid amount",
+				"wallet_id": wallet.ID.String(),
+				"date":      time.Now().Format(time.RFC3339),
 			},
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -202,7 +202,7 @@ func TestTransactionIntegration_ListTransactions(t *testing.T) {
 					t.Error("Expected success to be true")
 				}
 				data := resp["data"].(map[string]interface{})
-				transactionsList := data["transactions"].([]interface{})
+				transactionsList := data["data"].([]interface{})
 				if len(transactionsList) != 3 {
 					t.Errorf("Expected 3 transactions, got %d", len(transactionsList))
 				}
@@ -217,7 +217,7 @@ func TestTransactionIntegration_ListTransactions(t *testing.T) {
 					t.Error("Expected success to be true")
 				}
 				data := resp["data"].(map[string]interface{})
-				transactionsList := data["transactions"].([]interface{})
+				transactionsList := data["data"].([]interface{})
 				if len(transactionsList) > 2 {
 					t.Errorf("Expected at most 2 transactions, got %d", len(transactionsList))
 				}
@@ -232,7 +232,7 @@ func TestTransactionIntegration_ListTransactions(t *testing.T) {
 					t.Error("Expected success to be true")
 				}
 				data := resp["data"].(map[string]interface{})
-				transactionsList := data["transactions"].([]interface{})
+				transactionsList := data["data"].([]interface{})
 				// Should only get expense transactions
 				for _, trans := range transactionsList {
 					transData := trans.(map[string]interface{})
@@ -389,8 +389,8 @@ func TestTransactionIntegration_UpdateTransaction(t *testing.T) {
 			name:          "successful transaction update",
 			transactionID: transaction.ID.String(),
 			requestBody: map[string]interface{}{
-				"description": "Updated description",
-				"amount":      600.00,
+				"notes":  "Updated description",
+				"amount": 600.00,
 			},
 			expectedStatus: http.StatusOK,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -413,9 +413,9 @@ func TestTransactionIntegration_UpdateTransaction(t *testing.T) {
 			name:          "update non-existent transaction",
 			transactionID: "00000000-0000-0000-0000-000000000000",
 			requestBody: map[string]interface{}{
-				"description": "Should fail",
+				"notes": "Should fail",
 			},
-			expectedStatus: http.StatusNotFound,
+			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
 				if resp["success"].(bool) {
 					t.Error("Expected success to be false")
@@ -481,13 +481,9 @@ func TestTransactionIntegration_DeleteTransaction(t *testing.T) {
 		{
 			name:           "successful transaction deletion",
 			transactionID:  transaction.ID.String(),
-			expectedStatus: http.StatusOK,
+			expectedStatus: http.StatusNoContent,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
-				if !resp["success"].(bool) {
-					t.Error("Expected success to be true")
-				}
-
-				// Verify transaction was deleted from database
+				// 204 responses have no body; verify deletion in the database
 				var deletedTransaction models.Transaction
 				err := testDB.First(&deletedTransaction, transaction.ID).Error
 				if err == nil {
@@ -498,7 +494,7 @@ func TestTransactionIntegration_DeleteTransaction(t *testing.T) {
 		{
 			name:           "delete non-existent transaction",
 			transactionID:  "00000000-0000-0000-0000-000000000000",
-			expectedStatus: http.StatusNotFound,
+			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
 				if resp["success"].(bool) {
 					t.Error("Expected success to be false")

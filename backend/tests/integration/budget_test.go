@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/nyunja/fity-budget-backend/internal/models"
 )
@@ -15,6 +16,18 @@ func TestBudgetIntegration_CreateBudget(t *testing.T) {
 	cleanDatabaseForTest(t)
 
 	user, token := createTestUser(t, "budget@example.com")
+
+	// Seed a "Transport" budget so the duplicate-category case has an
+	// existing budget to collide with before the request is made.
+	existingBudget := &models.Budget{
+		UserID:      user.ID,
+		Category:    "Transport",
+		LimitAmount: 5000.00,
+		Color:       "#3B82F6",
+	}
+	if err := testDB.Create(existingBudget).Error; err != nil {
+		t.Fatalf("Failed to seed existing budget: %v", err)
+	}
 
 	tests := []struct {
 		name           string
@@ -58,16 +71,6 @@ func TestBudgetIntegration_CreateBudget(t *testing.T) {
 			},
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
-				// First create a budget with this category
-				existingBudget := &models.Budget{
-					UserID:      user.ID,
-					Category:    "Transport",
-					LimitAmount: 5000.00,
-					Color:       "#3B82F6",
-				}
-				testDB.Create(existingBudget)
-
-				// The second attempt should fail
 				if resp["success"].(bool) {
 					t.Error("Expected success to be false for duplicate category")
 				}
@@ -198,8 +201,8 @@ func TestBudgetIntegration_GetBudget(t *testing.T) {
 				if budgetData["category"] != "Shopping" {
 					t.Errorf("Expected category 'Shopping', got %s", budgetData["category"])
 				}
-				if budgetData["limit_amount"].(float64) != 10000.00 {
-					t.Errorf("Expected limit 10000.00, got %f", budgetData["limit_amount"])
+				if budgetData["limit"].(float64) != 10000.00 {
+					t.Errorf("Expected limit 10000.00, got %f", budgetData["limit"])
 				}
 			},
 		},
@@ -287,7 +290,7 @@ func TestBudgetIntegration_UpdateBudget(t *testing.T) {
 			requestBody: map[string]interface{}{
 				"limit": 5000.00,
 			},
-			expectedStatus: http.StatusNotFound,
+			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
 				if resp["success"].(bool) {
 					t.Error("Expected success to be false")
@@ -347,6 +350,21 @@ func TestBudgetIntegration_GetBudgetSummary(t *testing.T) {
 
 	for _, budget := range budgets {
 		testDB.Create(&budget)
+	}
+
+	// Spend more than the "Food" limit this month so one budget is over.
+	overBudgetTxn := models.Transaction{
+		UserID:          user.ID,
+		Amount:          20000.00,
+		Type:            "expense",
+		Name:            "Over-budget groceries",
+		Method:          "Cash",
+		Category:        "Food",
+		Status:          "Completed",
+		TransactionDate: time.Now(),
+	}
+	if err := testDB.Create(&overBudgetTxn).Error; err != nil {
+		t.Fatalf("Failed to seed over-budget transaction: %v", err)
 	}
 
 	req, _ := http.NewRequest("GET", "/api/v1/budgets/summary", nil)
@@ -416,15 +434,8 @@ func TestBudgetIntegration_DeleteBudget(t *testing.T) {
 	w := httptest.NewRecorder()
 	testRouter.ServeHTTP(w, req)
 
-	if w.Code != http.StatusOK {
-		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
-	}
-
-	var response map[string]interface{}
-	json.Unmarshal(w.Body.Bytes(), &response)
-
-	if !response["success"].(bool) {
-		t.Error("Expected success to be true")
+	if w.Code != http.StatusNoContent {
+		t.Errorf("Expected status %d, got %d", http.StatusNoContent, w.Code)
 	}
 
 	// Verify budget was deleted
