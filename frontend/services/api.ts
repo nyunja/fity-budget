@@ -297,6 +297,9 @@ export const budgetsAPI = {
       limit?: number;
       alert_threshold?: number;
       period?: string;
+      is_rollover?: boolean;
+      type?: 'Fixed' | 'Variable';
+      color?: string;
     }
   ) => {
     return apiRequest(`/budgets/${id}`, {
