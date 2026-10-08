@@ -50,6 +50,7 @@ func SetupRoutes(
 			auth.GET("/me", authHandler.GetMe)
 			auth.PUT("/profile", authHandler.UpdateProfile)
 			auth.PUT("/password", authHandler.ChangePassword)
+			auth.DELETE("/account", authHandler.DeleteAccount)
 			auth.POST("/onboarding", authHandler.CompleteOnboarding)
 		}
 

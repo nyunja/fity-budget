@@ -14,6 +14,8 @@ type UserRepository interface {
 	FindAll() ([]*models.User, error)
 	Update(user *models.User) error
 	Delete(id uuid.UUID) error
+	// DeleteAccount permanently removes the user and all owned records.
+	DeleteAccount(id uuid.UUID) error
 }
 
 type userRepository struct {
@@ -58,4 +60,24 @@ func (r *userRepository) Update(user *models.User) error {
 
 func (r *userRepository) Delete(id uuid.UUID) error {
 	return r.db.Delete(&models.User{}, id).Error
+}
+
+// DeleteAccount hard-deletes the user and every record they own. Children are
+// removed before the user to satisfy the foreign key constraints.
+func (r *userRepository) DeleteAccount(id uuid.UUID) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Unscoped().Where("user_id = ?", id).Delete(&models.Transaction{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Unscoped().Where("user_id = ?", id).Delete(&models.Wallet{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Unscoped().Where("user_id = ?", id).Delete(&models.Budget{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Unscoped().Where("user_id = ?", id).Delete(&models.SavingGoal{}).Error; err != nil {
+			return err
+		}
+		return tx.Unscoped().Delete(&models.User{}, "id = ?", id).Error
+	})
 }

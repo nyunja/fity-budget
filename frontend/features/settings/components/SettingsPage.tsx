@@ -28,6 +28,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { authAPI } from '../../../services/api';
 import { toast } from '../../../utils/toast';
 import ChangePasswordModal from './ChangePasswordModal';
+import DeleteAccountModal from './DeleteAccountModal';
 
 interface SettingsPageProps {
   user: UserType;
@@ -54,6 +55,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const handleSaveProfile = async () => {
     if (!profileName.trim() || !profileEmail.trim()) {
@@ -307,7 +309,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
                         >
                             Log Out All Devices
                         </button>
-                        <button className="px-4 py-2 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors">
+                        <button
+                            onClick={() => setIsDeleteOpen(true)}
+                            className="px-4 py-2 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors"
+                        >
                             Delete Account
                         </button>
                      </div>
@@ -469,6 +474,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
       </div>
 
       {isPasswordOpen && <ChangePasswordModal onClose={() => setIsPasswordOpen(false)} />}
+      {isDeleteOpen && <DeleteAccountModal onClose={() => setIsDeleteOpen(false)} />}
     </div>
   );
 };

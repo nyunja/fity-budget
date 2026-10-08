@@ -97,6 +97,13 @@ export const authAPI = {
     });
   },
 
+  deleteAccount: async (password: string): Promise<APIResponse<{ message: string }>> => {
+    return apiRequest<{ message: string }>('/auth/account', {
+      method: 'DELETE',
+      body: JSON.stringify({ password }),
+    });
+  },
+
   completeOnboarding: async (data: {
     monthly_income: number;
     currency: string;
