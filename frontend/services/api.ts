@@ -195,7 +195,7 @@ export const goalsAPI = {
     name: string;
     target: number;
     current?:number;
-    deadline: string;
+    deadline?: string;
     category?: string;
     priority?: GoalPriority;
     color?: string;
