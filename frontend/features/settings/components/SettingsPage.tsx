@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { User as UserType } from '../../../types';
 import { useAuth } from '../../../contexts/AuthContext';
-import { authAPI } from '../../../services/api';
+import { authAPI, transactionsAPI } from '../../../services/api';
 import { toast } from '../../../utils/toast';
 import ChangePasswordModal from './ChangePasswordModal';
 import DeleteAccountModal from './DeleteAccountModal';
@@ -56,6 +56,23 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   const [isPasswordOpen, setIsPasswordOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const handleExportCSV = async () => {
+    const result = await transactionsAPI.exportCSV();
+    if (result.success && result.data) {
+      const url = URL.createObjectURL(result.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'transactions.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      toast.success('Transactions exported');
+    } else {
+      toast.error(result.error?.message || 'Failed to export transactions');
+    }
+  };
 
   const handleSaveProfile = async () => {
     if (!profileName.trim() || !profileEmail.trim()) {
@@ -385,7 +402,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
                     <h4 className="font-bold text-gray-900 dark:text-white mb-4">Export Data</h4>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Download your transaction history and budget reports for your records.</p>
                     <div className="flex flex-wrap gap-4">
-                        <button className="flex items-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <button
+                            onClick={handleExportCSV}
+                            className="flex items-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        >
                             <Download size={18} /> Export CSV
                         </button>
                         <button className="flex items-center gap-2 px-5 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">

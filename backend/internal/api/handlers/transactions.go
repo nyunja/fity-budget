@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/csv"
 	"net/http"
 	"strconv"
 	"time"
@@ -119,6 +120,65 @@ func (h *TransactionHandler) ListTransactions(c *gin.Context) {
 			"has_prev":    hasPrev,
 		},
 	})
+}
+
+// ExportTransactions godoc
+// @Summary Export transactions as CSV
+// @Description Download the authenticated user's transactions as a CSV file
+// @Tags transactions
+// @Produce text/csv
+// @Security BearerAuth
+// @Param start_date query string false "Start date (RFC3339 or YYYY-MM-DD)"
+// @Param end_date query string false "End date, inclusive (RFC3339 or YYYY-MM-DD)"
+// @Param wallet_id query string false "Filter by wallet ID"
+// @Success 200 {file} file "CSV file"
+// @Failure 401 {object} utils.Response
+// @Failure 500 {object} utils.Response
+// @Router /transactions/export [get]
+func (h *TransactionHandler) ExportTransactions(c *gin.Context) {
+	userID, err := middleware.GetUserID(c)
+	if err != nil {
+		utils.Error(c, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
+		return
+	}
+
+	filter := services.TransactionFilter{
+		StartDate: parseQueryDate(c.Query("start_date"), false),
+		EndDate:   parseQueryDate(c.Query("end_date"), true),
+	}
+	if walletIDStr := c.Query("wallet_id"); walletIDStr != "" {
+		parsed, err := uuid.Parse(walletIDStr)
+		if err != nil {
+			utils.Error(c, http.StatusBadRequest, "INVALID_WALLET_ID", "wallet_id must be a valid UUID")
+			return
+		}
+		filter.WalletID = &parsed
+	}
+
+	transactions, _, err := h.transactionService.GetUserTransactionsWithCount(userID, 10000, 0, filter)
+	if err != nil {
+		utils.Error(c, http.StatusInternalServerError, "EXPORT_FAILED", err.Error())
+		return
+	}
+
+	c.Header("Content-Type", "text/csv; charset=utf-8")
+	c.Header("Content-Disposition", `attachment; filename="transactions.csv"`)
+
+	w := csv.NewWriter(c.Writer)
+	_ = w.Write([]string{"Date", "Name", "Type", "Category", "Amount", "Status", "Method", "Notes"})
+	for _, t := range transactions {
+		_ = w.Write([]string{
+			t.TransactionDate.Format("2006-01-02"),
+			t.Name,
+			t.Type,
+			t.Category,
+			strconv.FormatFloat(t.Amount, 'f', 2, 64),
+			t.Status,
+			t.Method,
+			t.Notes,
+		})
+	}
+	w.Flush()
 }
 
 // GetTransaction godoc

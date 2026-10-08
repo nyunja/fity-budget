@@ -60,6 +60,7 @@ func SetupRoutes(
 			transactions.GET("", transactionHandler.ListTransactions)
 			transactions.POST("", transactionHandler.CreateTransaction)
 			transactions.GET("/stats", transactionHandler.GetTransactionStats)
+			transactions.GET("/export", transactionHandler.ExportTransactions)
 			transactions.GET("/:id", transactionHandler.GetTransaction)
 			transactions.PUT("/:id", transactionHandler.UpdateTransaction)
 			transactions.DELETE("/:id", transactionHandler.DeleteTransaction)
