@@ -30,8 +30,9 @@ type LoginRequest struct {
 }
 
 type UpdateProfileRequest struct {
-	Name  string `json:"name" binding:"required"`
-	Email string `json:"email" binding:"required,email"`
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Currency string `json:"currency" binding:"omitempty,len=3"`
 }
 
 type OnboardingRequest struct {
@@ -153,7 +154,7 @@ func (h *AuthHandler) UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	user, err := h.authService.UpdateProfile(userID, req.Name, req.Email)
+	user, err := h.authService.UpdateProfile(userID, req.Name, req.Email, req.Currency)
 	if err != nil {
 		utils.Error(c, http.StatusBadRequest, "UPDATE_FAILED", err.Error())
 		return
