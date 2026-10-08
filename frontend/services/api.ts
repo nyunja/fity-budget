@@ -1,6 +1,11 @@
 // API Client for FityBudget Backend
 
-import { GoalPriority } from "@/types";
+import { GoalPriority, User } from "@/types";
+
+interface AuthResponse {
+  token: string;
+  user: User;
+}
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
 
@@ -52,22 +57,22 @@ async function apiRequest<T>(
 
 // Auth API
 export const authAPI = {
-  register: async (name: string, email: string, password: string) => {
-    return apiRequest('/auth/register', {
+  register: async (name: string, email: string, password: string): Promise<APIResponse<AuthResponse>> => {
+    return apiRequest<AuthResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ name, email, password }),
     });
   },
 
-  login: async (email: string, password: string) => {
-    return apiRequest('/auth/login', {
+  login: async (email: string, password: string): Promise<APIResponse<AuthResponse>> => {
+    return apiRequest<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
   },
 
-  getMe: async () => {
-    return apiRequest('/auth/me', {
+  getMe: async (): Promise<APIResponse<{ user: User }>> => {
+    return apiRequest<{ user: User }>('/auth/me', {
       method: 'GET',
     });
   },
