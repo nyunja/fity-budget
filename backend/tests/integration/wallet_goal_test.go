@@ -194,11 +194,11 @@ func TestGoalIntegration_CreateGoal(t *testing.T) {
 		{
 			name: "successful goal creation",
 			requestBody: map[string]interface{}{
-				"name":          "New Laptop",
-				"target_amount": 50000.00,
-				"deadline":      time.Now().AddDate(0, 3, 0).Format(time.RFC3339),
-				"category":      "Electronics",
-				"color":         "#3B82F6",
+				"name":     "New Laptop",
+				"target":   50000.00,
+				"deadline": time.Now().AddDate(0, 3, 0).Format(time.RFC3339),
+				"category": "Electronics",
+				"color":    "#3B82F6",
 			},
 			expectedStatus: http.StatusCreated,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -222,9 +222,10 @@ func TestGoalIntegration_CreateGoal(t *testing.T) {
 		{
 			name: "create goal with invalid target amount",
 			requestBody: map[string]interface{}{
-				"name":          "Invalid Goal",
-				"target_amount": -1000.00,
-				"deadline":      time.Now().AddDate(0, 1, 0).Format(time.RFC3339),
+				"name":     "Invalid Goal",
+				"target":   -1000.00,
+				"deadline": time.Now().AddDate(0, 1, 0).Format(time.RFC3339),
+				"color":    "#3B82F6",
 			},
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
@@ -415,15 +416,8 @@ func TestGoalIntegration_DeleteGoal(t *testing.T) {
 	w := httptest.NewRecorder()
 	testRouter.ServeHTTP(w, req)
 
-	if w.Code != http.StatusOK {
-		t.Errorf("Expected status %d, got %d", http.StatusOK, w.Code)
-	}
-
-	var response map[string]interface{}
-	json.Unmarshal(w.Body.Bytes(), &response)
-
-	if !response["success"].(bool) {
-		t.Error("Expected success to be true")
+	if w.Code != http.StatusNoContent {
+		t.Errorf("Expected status %d, got %d", http.StatusNoContent, w.Code)
 	}
 
 	// Verify goal was deleted

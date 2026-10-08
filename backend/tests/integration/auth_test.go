@@ -14,6 +14,18 @@ import (
 func TestAuthIntegration_Register(t *testing.T) {
 	cleanDatabaseForTest(t)
 
+	// Seed a user so the "existing email" case has something to collide with
+	// (it must exist before the request is made, not after).
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+	existingUser := &models.User{
+		Name:         "Existing User",
+		Email:        "existing@example.com",
+		PasswordHash: string(hashedPassword),
+	}
+	if err := testDB.Create(existingUser).Error; err != nil {
+		t.Fatalf("Failed to seed existing user: %v", err)
+	}
+
 	tests := []struct {
 		name           string
 		requestBody    map[string]interface{}
@@ -59,15 +71,6 @@ func TestAuthIntegration_Register(t *testing.T) {
 			},
 			expectedStatus: http.StatusBadRequest,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
-				// First create a user with this email
-				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
-				existingUser := &models.User{
-					Name:         "Existing User",
-					Email:        "existing@example.com",
-					PasswordHash: string(hashedPassword),
-				}
-				testDB.Create(existingUser)
-
 				if resp["success"].(bool) {
 					t.Error("Expected success to be false")
 				}
@@ -315,7 +318,8 @@ func TestAuthIntegration_UpdateProfile(t *testing.T) {
 			name:      "successful profile update",
 			authToken: token,
 			requestBody: map[string]interface{}{
-				"name": "Updated Name",
+				"name":  "Updated Name",
+				"email": "update@example.com",
 			},
 			expectedStatus: http.StatusOK,
 			checkResponse: func(t *testing.T, resp map[string]interface{}) {
