@@ -90,6 +90,13 @@ export const authAPI = {
     });
   },
 
+  changePassword: async (data: { current_password: string; new_password: string }): Promise<APIResponse<{ message: string }>> => {
+    return apiRequest<{ message: string }>('/auth/password', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
   completeOnboarding: async (data: {
     monthly_income: number;
     currency: string;

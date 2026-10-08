@@ -27,6 +27,7 @@ import { User as UserType } from '../../../types';
 import { useAuth } from '../../../contexts/AuthContext';
 import { authAPI } from '../../../services/api';
 import { toast } from '../../../utils/toast';
+import ChangePasswordModal from './ChangePasswordModal';
 
 interface SettingsPageProps {
   user: UserType;
@@ -52,6 +53,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
   const [showBalance, setShowBalance] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
+  const [isPasswordOpen, setIsPasswordOpen] = useState(false);
 
   const handleSaveProfile = async () => {
     if (!profileName.trim() || !profileEmail.trim()) {
@@ -250,7 +252,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
                                 <p className="text-sm text-gray-500 dark:text-gray-400">Update your account password</p>
                             </div>
                         </div>
-                        <button className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
+                        <button
+                            onClick={() => setIsPasswordOpen(true)}
+                            className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors"
+                        >
                             Update
                         </button>
                     </div>
@@ -462,6 +467,8 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
             {renderContent()}
          </div>
       </div>
+
+      {isPasswordOpen && <ChangePasswordModal onClose={() => setIsPasswordOpen(false)} />}
     </div>
   );
 };

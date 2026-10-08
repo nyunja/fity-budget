@@ -17,6 +17,7 @@ type AuthService interface {
 	Login(email, password string) (*models.User, string, error)
 	GetUserByID(id uuid.UUID) (*models.User, error)
 	UpdateProfile(id uuid.UUID, name, email, currency string) (*models.User, error)
+	ChangePassword(id uuid.UUID, currentPassword, newPassword string) error
 	CompleteOnboarding(id uuid.UUID, monthlyIncome float64, currency string) error
 }
 
@@ -110,6 +111,22 @@ func (s *authService) UpdateProfile(id uuid.UUID, name, email, currency string) 
 	}
 	user.PasswordHash = ""
 	return user, nil
+}
+
+func (s *authService) ChangePassword(id uuid.UUID, currentPassword, newPassword string) error {
+	user, err := s.userRepo.FindByID(id)
+	if err != nil {
+		return errors.New("user not found")
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(currentPassword)); err != nil {
+		return errors.New("current password is incorrect")
+	}
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.PasswordHash = string(hashedPassword)
+	return s.userRepo.Update(user)
 }
 
 func (s *authService) CompleteOnboarding(id uuid.UUID, monthlyIncome float64, currency string) error {

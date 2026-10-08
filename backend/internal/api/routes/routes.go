@@ -49,6 +49,7 @@ func SetupRoutes(
 		{
 			auth.GET("/me", authHandler.GetMe)
 			auth.PUT("/profile", authHandler.UpdateProfile)
+			auth.PUT("/password", authHandler.ChangePassword)
 			auth.POST("/onboarding", authHandler.CompleteOnboarding)
 		}
 
