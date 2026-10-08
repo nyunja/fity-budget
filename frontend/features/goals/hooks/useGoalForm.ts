@@ -42,8 +42,10 @@ export const useGoalForm = () => {
     name: formName,
     target: parseFloat(formTarget),
     current: parseFloat(formCurrent) || 0,
-    // Date inputs give YYYY-MM-DD; the backend requires a full timestamp
-    deadline: formDeadline ? new Date(`${formDeadline}T00:00:00`).toISOString() : '',
+    // Date inputs give YYYY-MM-DD; the backend requires a full timestamp.
+    // Omit the field entirely when no deadline is set so the optional time
+    // field isn't sent as an empty string (which fails JSON time parsing).
+    deadline: formDeadline ? new Date(`${formDeadline}T00:00:00`).toISOString() : undefined,
     priority: formPriority,
     // Backend requires a color; use the default accent until the form offers a picker
     color: '#6366f1',
