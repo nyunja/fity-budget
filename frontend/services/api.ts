@@ -202,6 +202,30 @@ export const transactionsAPI = {
       method: 'GET',
     });
   },
+
+  exportCSV: async (params?: { start_date?: string; end_date?: string }): Promise<APIResponse<Blob>> => {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) queryParams.append(key, value);
+      });
+    }
+    const query = queryParams.toString();
+    const token = localStorage.getItem('authToken');
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/transactions/export${query ? `?${query}` : ''}`,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      if (!response.ok) {
+        return { success: false, error: { code: 'EXPORT_FAILED', message: 'Failed to export transactions' } };
+      }
+      return { success: true, data: await response.blob() };
+    } catch (error) {
+      return { success: false, error: { code: 'NETWORK_ERROR', message: 'Failed to connect to server' } };
+    }
+  },
 };
 
 // Goals API
