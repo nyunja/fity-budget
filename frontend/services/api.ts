@@ -83,8 +83,8 @@ export const authAPI = {
     });
   },
 
-  updateProfile: async (data: { name?: string; email?: string }) => {
-    return apiRequest('/auth/profile', {
+  updateProfile: async (data: { name?: string; email?: string; currency?: string }): Promise<APIResponse<{ user: User }>> => {
+    return apiRequest<{ user: User }>('/auth/profile', {
       method: 'PUT',
       body: JSON.stringify(data),
     });

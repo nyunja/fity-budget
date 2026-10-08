@@ -16,7 +16,7 @@ type AuthService interface {
 	Register(name, email, password string) (*models.User, string, error)
 	Login(email, password string) (*models.User, string, error)
 	GetUserByID(id uuid.UUID) (*models.User, error)
-	UpdateProfile(id uuid.UUID, name, email string) (*models.User, error)
+	UpdateProfile(id uuid.UUID, name, email, currency string) (*models.User, error)
 	CompleteOnboarding(id uuid.UUID, monthlyIncome float64, currency string) error
 }
 
@@ -89,7 +89,7 @@ func (s *authService) GetUserByID(id uuid.UUID) (*models.User, error) {
 	return user, nil
 }
 
-func (s *authService) UpdateProfile(id uuid.UUID, name, email string) (*models.User, error) {
+func (s *authService) UpdateProfile(id uuid.UUID, name, email, currency string) (*models.User, error) {
 	user, err := s.userRepo.FindByID(id)
 	if err != nil {
 		return nil, errors.New("user not found")
@@ -102,6 +102,9 @@ func (s *authService) UpdateProfile(id uuid.UUID, name, email string) (*models.U
 	}
 	user.Name = name
 	user.Email = email
+	if currency != "" {
+		user.Currency = currency
+	}
 	if err := s.userRepo.Update(user); err != nil {
 		return nil, err
 	}

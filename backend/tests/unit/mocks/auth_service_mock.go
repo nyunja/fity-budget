@@ -10,7 +10,7 @@ type MockAuthService struct {
 	RegisterFunc           func(name, email, password string) (*models.User, string, error)
 	LoginFunc              func(email, password string) (*models.User, string, error)
 	GetUserByIDFunc        func(id uuid.UUID) (*models.User, error)
-	UpdateProfileFunc      func(id uuid.UUID, name, email string) (*models.User, error)
+	UpdateProfileFunc      func(id uuid.UUID, name, email, currency string) (*models.User, error)
 	CompleteOnboardingFunc func(id uuid.UUID, monthlyIncome float64, currency string) error
 }
 
@@ -35,9 +35,9 @@ func (m *MockAuthService) GetUserByID(id uuid.UUID) (*models.User, error) {
 	return nil, nil
 }
 
-func (m *MockAuthService) UpdateProfile(id uuid.UUID, name, email string) (*models.User, error) {
+func (m *MockAuthService) UpdateProfile(id uuid.UUID, name, email, currency string) (*models.User, error) {
 	if m.UpdateProfileFunc != nil {
-		return m.UpdateProfileFunc(id, name, email)
+		return m.UpdateProfileFunc(id, name, email, currency)
 	}
 	return nil, nil
 }

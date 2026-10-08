@@ -363,11 +363,12 @@ func TestAuthHandler_UpdateProfile(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockAuthService) {
-				m.UpdateProfileFunc = func(id uuid.UUID, name, email string) (*models.User, error) {
+				m.UpdateProfileFunc = func(id uuid.UUID, name, email, currency string) (*models.User, error) {
 					return &models.User{
-						ID:    id,
-						Name:  name,
-						Email: email,
+						ID:       id,
+						Name:     name,
+						Email:    email,
+						Currency: currency,
 					}, nil
 				}
 			},
@@ -393,7 +394,7 @@ func TestAuthHandler_UpdateProfile(t *testing.T) {
 				c.Set("userID", testutils.TestUserID)
 			},
 			mockSetup: func(m *mocks.MockAuthService) {
-				m.UpdateProfileFunc = func(id uuid.UUID, name, email string) (*models.User, error) {
+				m.UpdateProfileFunc = func(id uuid.UUID, name, email, currency string) (*models.User, error) {
 					return nil, errors.New("email already exists")
 				}
 			},

@@ -24,6 +24,9 @@ import {
   Check
 } from 'lucide-react';
 import { User as UserType } from '../../../types';
+import { useAuth } from '../../../contexts/AuthContext';
+import { authAPI } from '../../../services/api';
+import { toast } from '../../../utils/toast';
 
 interface SettingsPageProps {
   user: UserType;
@@ -36,13 +39,39 @@ type SettingsTab = 'profile' | 'preferences' | 'security' | 'notifications' | 'd
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleTheme, onLogout }) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
-  
-  // Local State for Form Interactions (Simulation)
-  const [currency, setCurrency] = useState('KES');
+  const { refreshUser } = useAuth();
+
+  // Profile form
+  const [profileName, setProfileName] = useState(user.name);
+  const [profileEmail, setProfileEmail] = useState(user.email);
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Local State for Form Interactions
+  const [currency, setCurrency] = useState(user.currency || 'USD');
   const [language, setLanguage] = useState('English');
   const [showBalance, setShowBalance] = useState(true);
   const [biometricEnabled, setBiometricEnabled] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
+
+  const handleSaveProfile = async () => {
+    if (!profileName.trim() || !profileEmail.trim()) {
+      toast.error('Name and email are required');
+      return;
+    }
+    setSavingProfile(true);
+    const result = await authAPI.updateProfile({
+      name: profileName.trim(),
+      email: profileEmail.trim(),
+      currency,
+    });
+    setSavingProfile(false);
+    if (result.success) {
+      await refreshUser();
+      toast.success('Profile updated');
+    } else {
+      toast.error(result.error?.message || 'Failed to update profile');
+    }
+  };
 
   const tabs = [
     { id: 'profile', label: 'Profile & Account', icon: User },
@@ -81,11 +110,11 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
                    <h3 className="text-lg font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Personal Information</h3>
                    <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
-                      <input type="text" defaultValue={user.name} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-indigo-500 outline-none" />
+                      <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-indigo-500 outline-none" />
                    </div>
                    <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
-                      <input type="email" defaultValue={user.email} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-indigo-500 outline-none" />
+                      <input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-indigo-500 outline-none" />
                    </div>
                    <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone Number</label>
@@ -130,8 +159,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
              </div>
              
              <div className="flex justify-end pt-4">
-                <button className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors">
-                   Save Changes
+                <button
+                   onClick={handleSaveProfile}
+                   disabled={savingProfile}
+                   className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                   {savingProfile ? 'Saving...' : 'Save Changes'}
                 </button>
              </div>
           </div>
