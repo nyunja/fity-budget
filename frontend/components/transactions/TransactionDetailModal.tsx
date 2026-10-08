@@ -7,6 +7,7 @@ import { cur } from '../../utils/currency';
 interface TransactionDetailModalProps {
   transaction: Transaction;
   onClose: () => void;
+  onEdit: (transaction: Transaction) => void;
   onDelete: (id: string) => void;
   deleting: boolean;
 }
@@ -15,6 +16,7 @@ interface TransactionDetailModalProps {
 export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
   transaction,
   onClose,
+  onEdit,
   onDelete,
   deleting,
 }) => {
@@ -67,7 +69,10 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
           )}
 
           <div className="grid grid-cols-2 gap-4 pt-4">
-            <button className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <button
+              onClick={() => onEdit(transaction)}
+              className="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
               <Edit2 size={16} /> Edit
             </button>
             <button

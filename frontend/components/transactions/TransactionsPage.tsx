@@ -11,6 +11,7 @@ import { TransactionHeaderAndFilters } from './TransactionFilters';
 import { TransactionList } from './TransactionList';
 import { TransactionDetailModal } from './TransactionDetailModal';
 import { AddTransactionModal } from './AddTransactionModal';
+import { EditTransactionModal } from './EditTransactionModal';
 
 const TransactionsPage: React.FC = () => {
   // Data fetching
@@ -44,6 +45,7 @@ const TransactionsPage: React.FC = () => {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
 
   // Form management
   const { formData, setters, submitError, handleSubmit, resetForm } = useTransactionForm(
@@ -129,8 +131,24 @@ const TransactionsPage: React.FC = () => {
         <TransactionDetailModal
           transaction={selectedTx}
           onClose={() => setSelectedTx(null)}
+          onEdit={(tx) => {
+            setSelectedTx(null);
+            setEditingTx(tx);
+          }}
           onDelete={handleDelete}
           deleting={deleting}
+        />
+      )}
+
+      {/* Edit Transaction Modal */}
+      {editingTx && (
+        <EditTransactionModal
+          transaction={editingTx}
+          onClose={() => setEditingTx(null)}
+          onSaved={() => {
+            setEditingTx(null);
+            refetch();
+          }}
         />
       )}
 
