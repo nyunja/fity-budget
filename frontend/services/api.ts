@@ -167,11 +167,13 @@ export const transactionsAPI = {
     id: string,
     data: {
       amount?: number;
+      type?: 'income' | 'expense';
       category?: string;
       name?: string;
       method?: string;
+      status?: 'Completed' | 'Pending' | 'Failed';
       notes?: string;
-      date?: string;
+      transaction_date?: string;
     }
   ) => {
     return apiRequest(`/transactions/${id}`, {
