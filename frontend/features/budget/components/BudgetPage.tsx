@@ -6,6 +6,7 @@ import { Budget, Transaction } from '../../../types';
 import MonthlySummary from './MonthlySummary';
 import CategoryGrid from './CategoryGrid';
 import CreateBudgetModal from './CreateBudgetModal';
+import RolloverRulesModal from './RolloverRulesModal';
 import useBudgetAnalysis from '../hooks/useBudgetAnalysis';
 import { usePeriod } from '../../../contexts/PeriodContext';
 
@@ -21,7 +22,12 @@ const BudgetPage: React.FC = () => {
       { auto: true, deps: [startDate, endDate] }
     );
 
-  const budgets = budgetsData?.budgets ?? [];
+  // Backend returns snake_case keys; normalise to the frontend Budget shape.
+  const budgets: Budget[] = (budgetsData?.budgets ?? []).map((b: any) => ({
+    ...b,
+    isRollover: b.is_rollover ?? false,
+    alertThreshold: b.alert_threshold ?? 80,
+  }));
   // Backend returns { data: [...] }; sign amounts from the type field
   const transactions: Transaction[] = (transactionsData?.data ?? []).map((tx: any) => {
     const amount = Math.abs(tx.amount || 0);
@@ -36,6 +42,7 @@ const BudgetPage: React.FC = () => {
   const { mutate: deleteBudget, loading: deleting } = useMutation(budgetsAPI.delete);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isRolloverOpen, setIsRolloverOpen] = useState(false);
   const budgetAnalysis = useBudgetAnalysis(budgets, transactions);
 
   const handleCreated = () => {
@@ -78,7 +85,10 @@ const BudgetPage: React.FC = () => {
           <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your expenses by category</p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm">
+          <button
+            onClick={() => setIsRolloverOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+          >
             <RefreshCw size={16} />
             <span>Rollover Rules</span>
           </button>
@@ -99,6 +109,14 @@ const BudgetPage: React.FC = () => {
           onSubmit={createBudget}
           loading={creating}
           onSuccess={handleCreated}
+        />
+      )}
+
+      {isRolloverOpen && (
+        <RolloverRulesModal
+          budgets={budgetAnalysis}
+          onClose={() => setIsRolloverOpen(false)}
+          onSaved={refetchBudgets}
         />
       )}
     </div>
