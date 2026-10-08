@@ -35,6 +35,11 @@ type UpdateProfileRequest struct {
 	Currency string `json:"currency" binding:"omitempty,len=3"`
 }
 
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"current_password" binding:"required"`
+	NewPassword     string `json:"new_password" binding:"required,min=8"`
+}
+
 type OnboardingRequest struct {
 	MonthlyIncome  float64  `json:"monthly_income" binding:"required,min=0"`
 	Currency       string   `json:"currency" binding:"required,len=3"`
@@ -162,6 +167,41 @@ func (h *AuthHandler) UpdateProfile(c *gin.Context) {
 
 	utils.Success(c, http.StatusOK, gin.H{
 		"user": user,
+	})
+}
+
+// ChangePassword godoc
+// @Summary Change user password
+// @Description Change the authenticated user's password after verifying the current one
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body ChangePasswordRequest true "Password change data"
+// @Success 200 {object} utils.Response{data=object{message=string}}
+// @Failure 400 {object} utils.Response
+// @Failure 401 {object} utils.Response
+// @Router /auth/password [put]
+func (h *AuthHandler) ChangePassword(c *gin.Context) {
+	userID, err := middleware.GetUserID(c)
+	if err != nil {
+		utils.Error(c, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
+		return
+	}
+
+	var req ChangePasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.Error(c, http.StatusBadRequest, "VALIDATION_ERROR", err.Error())
+		return
+	}
+
+	if err := h.authService.ChangePassword(userID, req.CurrentPassword, req.NewPassword); err != nil {
+		utils.Error(c, http.StatusBadRequest, "CHANGE_PASSWORD_FAILED", err.Error())
+		return
+	}
+
+	utils.Success(c, http.StatusOK, gin.H{
+		"message": "Password changed successfully",
 	})
 }
 
