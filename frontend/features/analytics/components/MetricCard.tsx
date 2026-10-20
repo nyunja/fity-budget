@@ -14,15 +14,15 @@ export const MetricCard: React.FC<{
     };
   
     return (
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between h-40">
-        <div className="flex justify-between">
+      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col justify-between min-h-[9.5rem]">
+        <div className="flex justify-between gap-2">
           <span className="text-gray-500 dark:text-gray-400 font-medium text-sm">{title}</span>
-          <div className={`p-2 ${colorClasses[color].bg} rounded-full ${colorClasses[color].text}`}>
+          <div className={`p-2 ${colorClasses[color].bg} rounded-full ${colorClasses[color].text} shrink-0`}>
             {icon}
           </div>
         </div>
         <div>
-          <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{cur()}{value.toLocaleString()}</h3>
+          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">{cur()}{value.toLocaleString()}</h3>
           <p className={`text-xs ${colorClasses[color].text} mt-1 font-medium`}>{trend}</p>
         </div>
       </div>
