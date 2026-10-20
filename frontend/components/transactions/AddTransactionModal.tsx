@@ -52,7 +52,8 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">New Transaction</h3>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            aria-label="Close"
+            className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
           >
             <X size={18} />
           </button>

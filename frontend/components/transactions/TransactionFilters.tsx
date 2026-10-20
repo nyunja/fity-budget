@@ -10,6 +10,8 @@ interface TransactionFiltersProps {
   filterWallet: string;
   onWalletChange: (wallet: string) => void;
   onAddClick: () => void;
+  onExportClick: () => void;
+  exporting?: boolean;
 }
 
 // Filters and controls component
@@ -21,6 +23,8 @@ export const TransactionHeaderAndFilters: React.FC<TransactionFiltersProps> = ({
   filterWallet,
   onWalletChange,
   onAddClick,
+  onExportClick,
+  exporting = false,
 }) => {
   return (
     <>
@@ -31,7 +35,7 @@ export const TransactionHeaderAndFilters: React.FC<TransactionFiltersProps> = ({
         </div>
         <div className="flex flex-wrap gap-3 w-full lg:w-auto">
           {/* Search */}
-          <div className="relative flex-grow lg:flex-grow-0 lg:w-64">
+          <div className="relative flex-grow min-w-0 basis-full sm:basis-auto lg:flex-grow-0 lg:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
@@ -42,13 +46,19 @@ export const TransactionHeaderAndFilters: React.FC<TransactionFiltersProps> = ({
             />
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+          <button
+            onClick={onExportClick}
+            disabled={exporting}
+            aria-label="Export transactions"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
             <Download size={18} />
             <span className="hidden sm:inline">Export</span>
           </button>
           <button
             onClick={onAddClick}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors"
+            aria-label="Add transaction"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors"
           >
             <Plus size={18} />
             <span className="hidden sm:inline">Add</span>

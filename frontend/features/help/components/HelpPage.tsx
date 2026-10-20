@@ -64,7 +64,7 @@ const HelpPage: React.FC = () => {
           </div>
           <h3 className="font-bold text-gray-900 dark:text-white mb-2">Live Chat</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Chat with our support team in real-time.</p>
-          <button className="text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:underline">Start Chat</button>
+          <button className="inline-flex py-2 -my-2 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:underline">Start Chat</button>
         </div>
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all text-center">
@@ -73,7 +73,7 @@ const HelpPage: React.FC = () => {
           </div>
           <h3 className="font-bold text-gray-900 dark:text-white mb-2">Email Support</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Get a response within 24 hours.</p>
-          <button className="text-blue-600 dark:text-blue-400 font-bold text-sm hover:underline">support@FityBudget.com</button>
+          <button className="inline-flex py-2 -my-2 text-blue-600 dark:text-blue-400 font-bold text-sm hover:underline">support@FityBudget.com</button>
         </div>
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all text-center">
@@ -82,7 +82,7 @@ const HelpPage: React.FC = () => {
           </div>
           <h3 className="font-bold text-gray-900 dark:text-white mb-2">Documentation</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Detailed guides and API references.</p>
-          <button className="text-green-600 dark:text-green-400 font-bold text-sm hover:underline flex items-center justify-center gap-1">
+          <button className="py-2 -my-2 text-green-600 dark:text-green-400 font-bold text-sm hover:underline flex items-center justify-center gap-1 mx-auto">
             View Docs <ExternalLink size={12} />
           </button>
         </div>

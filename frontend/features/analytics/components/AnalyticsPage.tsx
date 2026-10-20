@@ -88,9 +88,9 @@ const AnalyticsPage: React.FC = () => {
 
             {/* Trends (Area Chart) */}
             <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm">
-               <div className="flex justify-between items-center mb-6">
+               <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
                   <h3 className="font-bold text-lg text-gray-900 dark:text-white">Monthly Trends</h3>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 shrink-0">
                      <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <span className="w-3 h-3 rounded-full bg-indigo-500"></span> Income
                      </div>

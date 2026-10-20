@@ -119,10 +119,10 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
                       <RefreshCw size={14} />
                    </button>
                 </div>
-                <div>
+                <div className="min-w-0">
                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{user.name}</h2>
-                   <p className="text-gray-500 dark:text-gray-400">{user.email}</p>
-                   <button className="mt-2 text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Edit details</button>
+                   <p className="text-gray-500 dark:text-gray-400 break-all">{user.email}</p>
+                   <button className="mt-2 py-2 -my-1 text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Edit details</button>
                 </div>
              </div>
 
@@ -319,7 +319,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
                 <div className="bg-red-50 dark:bg-red-900/10 rounded-2xl border border-red-100 dark:border-red-900/30 p-6">
                      <h4 className="font-bold text-red-600 dark:text-red-400 mb-2">Danger Zone</h4>
                      <p className="text-sm text-red-500/80 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
-                     <div className="flex gap-4">
+                     <div className="flex flex-wrap gap-3">
                         <button 
                             onClick={onLogout}
                             className="px-4 py-2 bg-white dark:bg-red-900/20 border border-gray-200 dark:border-red-800 text-gray-700 dark:text-red-200 rounded-xl font-medium hover:bg-gray-50 dark:hover:bg-red-900/40 transition-colors"
@@ -466,7 +466,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ user, isDarkMode, toggleThe
       <div className="flex flex-col lg:flex-row gap-8">
          {/* Sidebar Navigation */}
          <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden sticky top-24">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden lg:sticky lg:top-24">
                {tabs.map((tab) => {
                   const isActive = activeTab === tab.id;
                   return (

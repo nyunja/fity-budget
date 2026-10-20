@@ -23,11 +23,19 @@ const WalletDetailModal: React.FC<WalletDetailModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative bg-white dark:bg-gray-800 rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[80vh] animate-fade-in">
+      <div className="relative bg-white dark:bg-gray-800 rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col md:flex-row max-h-[90vh] overflow-x-hidden overflow-y-auto md:h-[80vh] md:overflow-hidden animate-fade-in">
 
         {/* Left Panel: Wallet Info */}
-        <div className={`w-full md:w-1/3 bg-[${wallet.color}] p-8 text-white flex flex-col justify-between relative overflow-hidden`}>
+        <div className={`w-full md:w-1/3 flex-shrink-0 bg-[${wallet.color}] p-6 md:p-8 text-white flex flex-col justify-between relative overflow-hidden`}>
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+
+          <button
+            onClick={onClose}
+            aria-label="Close wallet details"
+            className="md:hidden absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-white/30 transition-colors"
+          >
+            <X size={18} />
+          </button>
 
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -78,10 +86,10 @@ const WalletDetailModal: React.FC<WalletDetailModalProps> = ({
         </div>
 
         {/* Right Panel: Transactions */}
-        <div className="flex-1 bg-white dark:bg-gray-800 p-8 flex flex-col">
+        <div className="flex-1 min-h-0 bg-white dark:bg-gray-800 p-6 md:p-8 flex flex-col">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white">Recent Activity</h3>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500">
+            <button onClick={onClose} aria-label="Close wallet details" className="hidden md:flex p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500">
               <X size={20} />
             </button>
           </div>

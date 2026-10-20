@@ -30,10 +30,10 @@ const CreateBudgetModal: React.FC<{
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in p-8">
+      <div className="relative bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Add Budget Category</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-900 dark:hover:text-white">
+          <button onClick={onClose} aria-label="Close" className="p-2 -m-2 text-gray-400 hover:text-gray-900 dark:hover:text-white">
             <X size={24} />
           </button>
         </div>

@@ -79,22 +79,22 @@ const BudgetPage: React.FC = () => {
   return (
     <div className="space-y-8 animate-fade-in pb-10">
       <MonthlySummary budgets={budgets} transactions={transactions} analysis={budgetAnalysis} />
-      <div className="flex flex-col sm:flex-row justify-between items-end sm:items-center gap-4 pt-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Budget Categories</h2>
           <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your expenses by category</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setIsRolloverOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+            className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm whitespace-nowrap"
           >
             <RefreshCw size={16} />
             <span>Rollover Rules</span>
           </button>
           <button
             onClick={() => setIsFormOpen(true)}
-            className="flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors"
+            className="flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold whitespace-nowrap hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors"
           >
             <Plus size={18} /> Add Budget
           </button>

@@ -107,13 +107,13 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
                 <input
                   id="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded bg-white dark:bg-gray-800"
+                  className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded bg-white dark:bg-gray-800"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-600 dark:text-gray-400">
                   Remember me
                 </label>
               </div>
-              <a href="#" className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
+              <a href="#" className="py-2 -my-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500">
                 Forgot password?
               </a>
             </div>
@@ -140,7 +140,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSwitchToRegister }) => {
             Don't have an account?{' '}
             <button 
               onClick={onSwitchToRegister}
-              className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
+              className="py-2 -my-2 font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
             >
               Sign up for free
             </button>

@@ -222,12 +222,12 @@ const GoalsPage: React.FC = () => {
       </div>
 
       {/* Controls & Heading */}
-      <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Goals</h2>
            <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your savings targets</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl">
              {['All', 'Active', 'Completed'].map(status => (
                 <button
@@ -245,7 +245,7 @@ const GoalsPage: React.FC = () => {
           </div>
           <button 
             onClick={() => setIsFormOpen(true)}
-            className="flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors"
+            className="flex items-center gap-2 px-5 py-2 bg-indigo-600 text-white rounded-xl font-bold whitespace-nowrap hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-colors"
           >
             <Plus size={18} /> Create Goal
           </button>
@@ -420,10 +420,10 @@ const GoalsPage: React.FC = () => {
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={resetForm}></div>
-           <div className="relative bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in p-8">
+           <div className="relative bg-white dark:bg-gray-800 rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Goal</h2>
-                 <button onClick={resetForm} className="text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                 <button onClick={resetForm} aria-label="Close" className="p-2 -m-2 text-gray-400 hover:text-gray-900 dark:hover:text-white">
                     <X size={24} />
                  </button>
               </div>
@@ -448,7 +448,7 @@ const GoalsPage: React.FC = () => {
                       placeholder="e.g. Emergency Fund"
                     />
                  </div>
-                 <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Target Amount</label>
                       <div className="relative">
@@ -480,7 +480,7 @@ const GoalsPage: React.FC = () => {
                     </div>
                  </div>
 
-                 <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Deadline <span className="text-gray-400 font-normal">(optional)</span></label>
                        <input 

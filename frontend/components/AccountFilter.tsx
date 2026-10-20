@@ -37,7 +37,7 @@ const AccountFilter: React.FC<AccountFilterProps> = ({ className = '' }) => {
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+        className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-2.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
       >
         {selected ? (
           <>

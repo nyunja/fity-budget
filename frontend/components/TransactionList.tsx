@@ -29,7 +29,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ data }) => {
             <button
               onClick={() => navigate('transactions')}
               aria-label="See all transactions"
-              className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors"
+              className="w-9 h-9 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-900 dark:hover:border-gray-400 transition-colors"
             >
               <ArrowUpRight size={16} />
             </button>
@@ -37,37 +37,38 @@ const TransactionList: React.FC<TransactionListProps> = ({ data }) => {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-0">
           <thead>
             <tr className="text-left text-xs text-indigo-400 uppercase tracking-wider border-b border-gray-50 dark:border-gray-700">
-              <th className="pb-3 font-medium pl-2">Date</th>
-              <th className="pb-3 font-medium">Amount</th>
+              <th className="pb-3 pr-2 font-medium pl-2 whitespace-nowrap">Date</th>
+              <th className="pb-3 pr-2 font-medium whitespace-nowrap">Amount</th>
               <th className="pb-3 font-medium">Payment Name</th>
-              <th className="pb-3 font-medium">Method</th>
-              <th className="pb-3 font-medium">Category</th>
+              <th className="hidden md:table-cell pb-3 font-medium">Method</th>
+              <th className="hidden md:table-cell pb-3 font-medium">Category</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
             {data.length > 0 ? (
               data.map((tx) => (
               <tr key={tx.id} className="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <td className="py-4 pl-2 text-sm font-medium text-gray-900 dark:text-white">{tx.date}</td>
-                <td className={`py-4 text-sm font-bold ${tx.amount > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
+                <td className="py-4 pl-2 pr-2 text-sm font-medium text-gray-900 dark:text-white whitespace-nowrap">{tx.date}</td>
+                <td className={`py-4 pr-2 text-sm font-bold whitespace-nowrap ${tx.amount > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-white'}`}>
                   {tx.amount > 0 ? '+' : ''} ${Math.abs(tx.amount)}
                 </td>
-                <td className="py-4 text-sm text-gray-900 dark:text-white">
+                <td className="py-4 text-sm text-gray-900 dark:text-white min-w-0">
                   <div className="flex items-center gap-3">
                     {getIcon(tx.name, tx.category)}
-                    <span className="font-medium">{tx.name}</span>
+                    <span className="font-medium break-words">{tx.name}</span>
                   </div>
                 </td>
-                <td className="py-4 text-sm text-gray-500 dark:text-gray-400">{tx.method}</td>
-                <td className="py-4 text-sm text-gray-900 dark:text-white font-medium">{tx.category}</td>
+                <td className="hidden md:table-cell py-4 text-sm text-gray-500 dark:text-gray-400">{tx.method}</td>
+                <td className="hidden md:table-cell py-4 text-sm text-gray-900 dark:text-white font-medium">{tx.category}</td>
               </tr>
             ))
             ) : (
                <tr>
-                <td colSpan={5} className="py-8 text-center text-gray-500 dark:text-gray-400 text-sm">No recent transactions</td>
+                <td colSpan={3} className="py-8 text-center text-gray-500 dark:text-gray-400 text-sm md:hidden">No recent transactions</td>
+                <td colSpan={5} className="hidden md:table-cell py-8 text-center text-gray-500 dark:text-gray-400 text-sm">No recent transactions</td>
               </tr>
             )}
           </tbody>

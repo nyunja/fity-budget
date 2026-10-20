@@ -22,7 +22,7 @@ const MonthlySummary: React.FC<{
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Monthly Summary</h2>
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 px-3 py-1.5 rounded-full shadow-sm">
+        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 px-3 py-1.5 rounded-full shadow-sm shrink-0 whitespace-nowrap">
           <Calendar size={14} />
           <span>This Month</span>
         </div>

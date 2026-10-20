@@ -177,16 +177,16 @@ const AppContent: React.FC = () => {
         onCloseMobile={() => setIsMobileNavOpen(false)}
       />
 
-      <div className="flex-1 lg:ml-64 relative">
-        {/* Sticky Header Container with Blur */}
-        <div className="sticky top-0 z-10 relative bg-[#F8F9FD]/90 dark:bg-gray-900/90 backdrop-blur-md p-4 md:p-8 pb-4">
+      <div className="flex-1 lg:ml-64 relative min-w-0">
+        {/* Sticky Header Container with Blur (desktop only; on mobile it would cover the page) */}
+        <div className="relative z-10 bg-[#F8F9FD]/90 dark:bg-gray-900/90 backdrop-blur-md p-4 md:p-8 pb-4 lg:sticky lg:top-0">
           {user && (
             <Header
               user={user}
               onGenerateInsights={handleGenerateInsights}
               isGenerating={isGenerating}
               insight={insight}
-              showPeriodFilter={view !== 'settings'}
+              showPeriodFilter={!['settings', 'goals', 'help'].includes(view)}
               onMenuClick={() => setIsMobileNavOpen(true)}
             />
           )}

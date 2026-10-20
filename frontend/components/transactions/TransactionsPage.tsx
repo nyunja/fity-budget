@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import { Transaction, WalletAccount } from '../../types';
 import { useAPI } from '../../hooks/useAPI';
-import { walletsAPI } from '../../services/api';
+import { walletsAPI, transactionsAPI } from '../../services/api';
 import { useTransactions } from '../../hooks/transactions/useTransactions';
 import { useTransactionMutations } from '../../hooks/transactions/useTransactionMutations';
 import { useTransactionFilters } from '../../hooks/transactions/useTransactionFilters';
 import { useTransactionForm } from '../../hooks/transactions/useTransactionForm';
+import { usePeriod } from '../../contexts/PeriodContext';
+import { toast } from '../../utils/toast';
 import { TransactionHeaderAndFilters } from './TransactionFilters';
 import { TransactionList } from './TransactionList';
 import { TransactionDetailModal } from './TransactionDetailModal';
@@ -14,6 +16,8 @@ import { AddTransactionModal } from './AddTransactionModal';
 import { EditTransactionModal } from './EditTransactionModal';
 
 const TransactionsPage: React.FC = () => {
+  const { startDate, endDate } = usePeriod();
+
   // Data fetching
   const { transactions, loading, error, refetch } = useTransactions();
 
@@ -23,6 +27,16 @@ const TransactionsPage: React.FC = () => {
     { auto: true }
   );
   const wallets = walletsData?.wallets || [];
+
+  // Replace wallet ids with readable names so filters and the detail modal
+  // can show the wallet the transaction belongs to.
+  const namedTransactions = useMemo(() => {
+    const namesById = new Map(wallets.map((wallet) => [wallet.id, wallet.name]));
+    return transactions.map((tx) => ({
+      ...tx,
+      wallet: tx.wallet ? namesById.get(tx.wallet) || tx.wallet : tx.wallet,
+    }));
+  }, [transactions, wallets]);
 
   // Mutations
   const { create: createTransaction, delete: deleteTransaction, creating, deleting } = useTransactionMutations({
@@ -36,7 +50,7 @@ const TransactionsPage: React.FC = () => {
 
   // Filtered data
   const { filteredData, summary, groupedTransactions } = useTransactionFilters(
-    transactions,
+    namedTransactions,
     filterType,
     searchQuery,
     filterWallet
@@ -46,6 +60,7 @@ const TransactionsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   // Form management
   const { formData, setters, submitError, handleSubmit, resetForm } = useTransactionForm(
@@ -74,6 +89,29 @@ const TransactionsPage: React.FC = () => {
       setSelectedTx(null); // Close the modal
     } else {
       alert(result.error || 'Failed to delete transaction');
+    }
+  };
+
+  // Export the transactions in the currently selected period as CSV
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const result = await transactionsAPI.exportCSV({ start_date: startDate, end_date: endDate });
+      if (result.success && result.data) {
+        const url = URL.createObjectURL(result.data);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `fitybudget-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        toast.success('Transactions exported successfully');
+      } else {
+        toast.error(result.error?.message || 'Failed to export transactions');
+      }
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -118,6 +156,8 @@ const TransactionsPage: React.FC = () => {
         filterWallet={filterWallet}
         onWalletChange={setFilterWallet}
         onAddClick={() => setIsModalOpen(true)}
+        onExportClick={handleExport}
+        exporting={exporting}
       />
 
       {/* Transaction List */}

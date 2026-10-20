@@ -151,7 +151,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister, onSwitchToLogin }) => {
             Already have an account?{' '}
             <button 
               onClick={onSwitchToLogin}
-              className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
+              className="py-2 -my-2 font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500"
             >
               Sign in
             </button>

@@ -29,7 +29,7 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({
         <div>
           <div className="flex items-center gap-3 mb-2">
             <span className="text-black text-sm font-medium uppercase tracking-wider">Total Balance</span>
-            <button onClick={onToggleBalance} className="text-black hover:text-white transition-colors">
+            <button onClick={onToggleBalance} aria-label={showBalance ? 'Hide balance' : 'Show balance'} className="p-2 -m-2 text-black hover:text-white transition-colors">
               {showBalance ? <Eye size={16} /> : <EyeOff size={16} />}
             </button>
           </div>
@@ -47,14 +47,14 @@ const WalletHeader: React.FC<WalletHeaderProps> = ({
         <div className="flex gap-3 w-full md:w-auto">
           <button
             onClick={onAddMoney}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-200 rounded-xl font-bold transition-colors shadow-sm"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-200 rounded-xl font-bold whitespace-nowrap transition-colors shadow-sm"
           >
             <Plus size={18} />
             <span>Add Money</span>
           </button>
           <button
             onClick={onTransfer}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-200 rounded-xl font-bold transition-colors shadow-sm"
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 sm:px-6 py-3 bg-indigo-600 text-white hover:bg-indigo-200 rounded-xl font-bold whitespace-nowrap transition-colors shadow-sm"
           >
             <ArrowRightLeft size={18} />
             <span>Transfer</span>
