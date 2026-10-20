@@ -28,7 +28,7 @@ const MonthlySummary: React.FC<{
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-6 mb-6">
         <MetricCard label="Monthly Income" value={monthlyIncome} icon={Wallet} />
         <MetricCard label="Total Budgeted" value={totalBudget} icon={Layers} />
         <MetricCard label="Total Spent" value={totalSpent} icon={ArrowUpRight} />
@@ -89,14 +89,14 @@ const MetricCard: React.FC<{
   icon: React.ElementType;
   valueClass?: string;
 }> = ({ label, value, icon: Icon, valueClass = 'text-gray-900 dark:text-white' }) => (
-  <div className="bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
-    <div className="flex justify-between items-start mb-4">
+  <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-all duration-300">
+    <div className="flex justify-between items-start gap-2 mb-4">
       <h3 className="text-gray-500 dark:text-gray-400 font-medium text-sm">{label}</h3>
-      <div className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400">
+      <div className="w-8 h-8 shrink-0 rounded-full border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400">
         <Icon size={16} />
       </div>
     </div>
-    <h2 className={`text-3xl font-bold ${valueClass}`}>${value.toLocaleString()}</h2>
+    <h2 className={`text-2xl sm:text-3xl font-bold ${valueClass}`}>${value.toLocaleString()}</h2>
   </div>
 );
 
